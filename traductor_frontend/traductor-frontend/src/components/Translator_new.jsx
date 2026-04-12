@@ -1,0 +1,401 @@
+import { useState } from "react";
+import { analizarTexto } from "../services/api";
+import TokensTable from "./TokensTable";
+import ErrorTable from "./ErrorTable";
+import ASTView from "./ASTView";
+import TablaSimbolosComponent from "./TablaSimbolosComponent";
+
+// Iconos SVG
+const Mic = () => (
+  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <path d="M12 1a3 3 0 0 0-3 3v12a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"></path>
+    <path d="M19 10v2a7 7 0 0 1-14 0v-2"></path>
+    <line x1="12" y1="19" x2="12" y2="23"></line>
+    <line x1="8" y1="23" x2="16" y2="23"></line>
+  </svg>
+);
+
+const Trash2 = () => (
+  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <polyline points="3 6 5 6 21 6"></polyline>
+    <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+    <line x1="10" y1="11" x2="10" y2="17"></line>
+    <line x1="14" y1="11" x2="14" y2="17"></line>
+  </svg>
+);
+
+const FileText = () => (
+  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+    <polyline points="14 2 14 8 20 8"></polyline>
+    <line x1="12" y1="13" x2="12" y2="19"></line>
+    <line x1="9" y1="16" x2="15" y2="16"></line>
+  </svg>
+);
+
+const Search = () => (
+  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <circle cx="11" cy="11" r="8"></circle>
+    <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+  </svg>
+);
+
+// Componente Tooltip Button
+const TooltipButton = ({ icon: Icon, label, tooltip, onClick, className, disabled, style, children }) => (
+  <div className="tooltip-wrapper">
+    <button
+      className={`tooltip-btn ${className || 'btn-secondary'}`}
+      onClick={onClick}
+      disabled={disabled}
+      style={style}
+    >
+      {Icon && <span className="btn-icon">{Icon}</span>}
+      <span className="btn-label">{label}</span>
+    </button>
+    <div className="tooltip-popup">{tooltip}</div>
+  </div>
+);
+
+function Translator() {
+  const [textoEntrada,  setTextoEntrada]  = useState("");
+  const [traduccion,    setTraduccion]    = useState("");
+  const [tokens,        setTokens]        = useState([]);
+  const [errores,       setErrores]       = useState([]);
+  const [astJson,       setAstJson]       = useState(null);
+  const [tablaSimbolos, setTablaSimbolos] = useState([]);
+  const [tabActiva,     setTabActiva]     = useState("tokens");
+  const [cargando,      setCargando]      = useState(false);
+  const [exitoso,       setExitoso]       = useState(null);
+  const [usarIA,        setUsarIA]        = useState(false);
+  const [usoIA,         setUsoIA]         = useState(false);
+  const [escuchando,    setEscuchando]    = useState(false);
+  const [idiomaVoz,     setIdiomaVoz]     = useState("en-US");
+
+  const handleAnalizar = async () => {
+    if (!textoEntrada.trim()) return;
+
+    setCargando(true);
+    setTraduccion("");
+    setTokens([]);
+    setErrores([]);
+    setAstJson(null);
+    setTablaSimbolos([]);
+    setExitoso(null);
+    setUsoIA(false);
+
+    try {
+      const resultado = await analizarTexto(textoEntrada, usarIA);
+
+      console.log("Respuesta completa:", resultado);
+      console.log("astJson recibido:",   resultado.astJson);
+      console.log("tablaSimbolos:",      resultado.tablaSimbolos);
+      console.log("usoIA:",              resultado.usoIA);
+
+      setTokens(resultado.tokens              || []);
+      setErrores(resultado.errores            || []);
+      setTraduccion(resultado.traduccion      || "");
+      setAstJson(resultado.astJson            || null);
+      setTablaSimbolos(resultado.tablaSimbolos || []);
+      setExitoso(resultado.exitoso);
+      setUsoIA(resultado.usoIA                || false);
+
+    } catch (error) {
+      setErrores([{
+        tipo: "LEXICO",
+        linea: 0,
+        columna: 0,
+        descripcion: "No se pudo conectar al backend: " + error.message
+      }]);
+      setExitoso(false);
+    } finally {
+      setCargando(false);
+    }
+  };
+
+  const handleCargarArchivo = (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = (ev) => setTextoEntrada(ev.target.result);
+    reader.readAsText(file);
+  };
+
+  const handleVoz = () => {
+    const SpeechRecognition =
+      window.SpeechRecognition || window.webkitSpeechRecognition;
+
+    if (!SpeechRecognition) {
+      alert("Tu navegador no soporta reconocimiento de voz. Usa Edge o Chrome.");
+      return;
+    }
+
+    const recognition = new SpeechRecognition();
+    recognition.lang             = idiomaVoz;
+    recognition.interimResults   = false;
+    recognition.maxAlternatives  = 1;
+    recognition.continuous       = false;
+
+    recognition.onstart = () => {
+      setEscuchando(true);
+      console.log("🎤 Escuchando en:", idiomaVoz);
+    };
+
+    recognition.onresult = (event) => {
+      const textoHablado = event.results[0][0].transcript;
+      console.log("🎤 Reconocido:", textoHablado);
+      setTextoEntrada(textoHablado);
+    };
+
+    recognition.onerror = (event) => {
+      console.error("❌ Error de voz:", event.error);
+      setEscuchando(false);
+      if (event.error === "not-allowed") {
+        alert("Permiso de micrófono denegado. Habilítalo en Edge: Configuración → Privacidad → Micrófono.");
+      }
+    };
+
+    recognition.onend = () => {
+      setEscuchando(false);
+    };
+
+    recognition.start();
+  };
+
+  return (
+    <div className="translator-wrapper">
+
+      {/* ── Panel de traducción ── */}
+      <div className="panels">
+
+        <div className="panel">
+          <div className="panel-header">🇺🇸 Inglés / 🇪🇸 Español (entrada)</div>
+          <textarea
+            value={textoEntrada}
+            onChange={(e) => setTextoEntrada(e.target.value)}
+            placeholder="Escribe o habla tu oración en inglés o español..."
+            rows={6}
+          />
+        </div>
+
+        <div className="panel-arrow">→</div>
+
+        <div className="panel">
+          <div className="panel-header">
+            {exitoso === true  && "✅ "}
+            {exitoso === false && "❌ "}
+            {exitoso === true
+              ? "🇪🇸 Español / 🇺🇸 Inglés (traducción)"
+              : "Resultado"}
+            {usoIA && (
+              <span style={{
+                marginLeft: "10px",
+                backgroundColor: "#6366f1",
+                color: "white",
+                padding: "2px 8px",
+                borderRadius: "12px",
+                fontSize: "11px",
+                fontWeight: "bold"
+              }}>
+                🤖 IA
+              </span>
+            )}
+          </div>
+
+          <div className="output-box">
+            {cargando
+              ? "Analizando..."
+              : traduccion
+              ? traduccion
+              : exitoso === false
+              ? "Se encontraron errores. Revisa la tabla de errores."
+              : "La traducción aparecerá aquí"}
+          </div>
+        </div>
+      </div>
+
+      {/* ── Botones ── */}
+      <div className="buttons">
+
+        <TooltipButton
+          icon={<Search />}
+          label="Traducir"
+          tooltip="Traduce y analiza el texto ingresado"
+          onClick={handleAnalizar}
+          disabled={cargando}
+          className="btn-primary"
+          style={{ opacity: cargando ? 0.7 : 1 }}
+        />
+
+        <label className="tooltip-wrapper">
+          <button className="tooltip-btn btn-secondary">
+            <span className="btn-icon"><FileText /></span>
+            <span className="btn-label">Cargar .txt</span>
+          </button>
+          <input
+            type="file"
+            accept=".txt"
+            onChange={handleCargarArchivo}
+            style={{ display: "none" }}
+          />
+          <div className="tooltip-popup">Carga un archivo de texto para analizar</div>
+        </label>
+
+        {/* ── Botón micrófono ── */}
+        <TooltipButton
+          icon={<Mic />}
+          label="Voz"
+          tooltip="Reconoce tu voz para traducir"
+          onClick={handleVoz}
+          disabled={escuchando || cargando}
+          className="btn-secondary"
+          style={{
+            background: escuchando
+              ? "linear-gradient(135deg, #ef4444 0%, #c0392b 100%)"
+              : "linear-gradient(135deg, #2a3144 0%, #252e3e 100%)",
+            color: escuchando ? "white" : "#ddd",
+            transition: "all 0.3s ease",
+            boxShadow: escuchando
+              ? "0 4px 12px rgba(239, 68, 68, 0.3)"
+              : "0 2px 8px rgba(0, 0, 0, 0.2)"
+          }}
+        />
+
+        {/* ── Selector idioma de voz ── */}
+        <select
+          value={idiomaVoz}
+          onChange={(e) => setIdiomaVoz(e.target.value)}
+          disabled={escuchando}
+          style={{
+            padding:      "10px 14px",
+            borderRadius: "10px",
+            border:       "1px solid #3a4558",
+            fontSize:     "0.95rem",
+            cursor:       "pointer",
+            background:   "linear-gradient(135deg, #2a3144 0%, #252e3e 100%)",
+            color:        "#ddd",
+            fontWeight:   "500",
+            transition:   "all 0.3s ease",
+            boxShadow:    "0 2px 8px rgba(0, 0, 0, 0.2)"
+          }}
+          onMouseEnter={(e) => {
+            if (!escuchando) {
+              e.currentTarget.style.boxShadow = "0 4px 12px rgba(52, 152, 219, 0.3)";
+              e.currentTarget.style.borderColor = "#3498db";
+            }
+          }}
+          onMouseLeave={(e) => {
+            e.currentTarget.style.boxShadow = "0 2px 8px rgba(0, 0, 0, 0.2)";
+            e.currentTarget.style.borderColor = "#3a4558";
+          }}
+        >
+          <option value="en-US">🇺🇸 English</option>
+          <option value="es-ES">🇪🇸 Español</option>
+        </select>
+
+        <TooltipButton
+          icon={<Trash2 />}
+          label="Limpiar"
+          tooltip="Borra todo el contenido"
+          onClick={() => {
+            setTextoEntrada("");
+            setTraduccion("");
+            setTokens([]);
+            setErrores([]);
+            setAstJson(null);
+            setTablaSimbolos([]);
+            setExitoso(null);
+            setUsoIA(false);
+          }}
+          className="btn-secondary"
+        />
+
+        {/* ── Checkbox IA ── */}
+        <label style={{
+          display:    "flex",
+          alignItems: "center",
+          gap:        "10px",
+          cursor:     "pointer",
+          fontSize:   "0.95rem",
+          userSelect: "none",
+          padding:    "6px 12px",
+          borderRadius: "8px",
+          background: "rgba(52, 152, 219, 0.1)",
+          border:     "1px solid rgba(52, 152, 219, 0.2)",
+          transition: "all 0.3s ease",
+          position:   "relative"
+        }}
+        onMouseEnter={(e) => {
+          e.currentTarget.style.background = "rgba(52, 152, 219, 0.15)";
+          e.currentTarget.style.borderColor = "rgba(52, 152, 219, 0.4)";
+        }}
+        onMouseLeave={(e) => {
+          e.currentTarget.style.background = "rgba(52, 152, 219, 0.1)";
+          e.currentTarget.style.borderColor = "rgba(52, 152, 219, 0.2)";
+        }}
+        title="Usa inteligencia artificial para mejorar la traducción"
+        >
+          <input
+            type="checkbox"
+            checked={usarIA}
+            onChange={(e) => setUsarIA(e.target.checked)}
+            style={{
+              cursor: "pointer",
+              width: "18px",
+              height: "18px"
+            }}
+          />
+          🤖 Usar IA
+        </label>
+
+      </div>
+
+      {/* ── Tabs ── */}
+      {(tokens.length > 0 || errores.length > 0 || tablaSimbolos.length > 0) && (
+        <div className="tabs-section">
+
+          <div className="tabs">
+            <button
+              className={tabActiva === "tokens"   ? "tab active" : "tab"}
+              onClick={() => setTabActiva("tokens")}
+            >
+              📋 Tokens ({tokens.length})
+            </button>
+
+            <button
+              className={tabActiva === "errores"  ? "tab active" : "tab"}
+              onClick={() => setTabActiva("errores")}
+            >
+              ❌ Errores ({errores.length})
+            </button>
+
+            <button
+              className={tabActiva === "ast"      ? "tab active" : "tab"}
+              onClick={() => setTabActiva("ast")}
+            >
+              🌳 AST
+            </button>
+
+            <button
+              className={tabActiva === "simbolos" ? "tab active" : "tab"}
+              onClick={() => setTabActiva("simbolos")}
+            >
+              📖 Símbolos ({tablaSimbolos.length})
+            </button>
+          </div>
+
+          <div className="tab-content">
+            {tabActiva === "tokens"   && <TokensTable tokens={tokens} />}
+            {tabActiva === "errores"  && <ErrorTable  errores={errores} />}
+            {tabActiva === "ast"      && <ASTView     astJson={astJson} />}
+            {tabActiva === "simbolos" && (
+              <TablaSimbolosComponent tablaSimbolos={tablaSimbolos} />
+            )}
+          </div>
+
+        </div>
+      )}
+    </div>
+  );
+}
+
+export default Translator;

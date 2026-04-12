@@ -1,0 +1,328 @@
+import com.compilador.lexer.Token;
+import com.compilador.ast.NodoAST;
+import java.util.List;
+import java.util.ArrayList;
+import java_cup.runtime.*;
+
+parser code {:
+    public NodoAST resultadoAST = null;
+
+    public java.util.List<String> erroresSintacticos =
+        new java.util.ArrayList<String>();
+
+    public void syntax_error(Symbol s) {
+        String lex = (s.value instanceof Token)
+            ? ((Token) s.value).getValor()
+            : (s.value != null ? s.value.toString() : "EOF");
+        erroresSintacticos.add("Error sintactico en linea " +
+            s.left + ", columna " + s.right +
+            ". Token inesperado: [" + lex + "]");
+    }
+
+    public void unrecovered_syntax_error(Symbol s) {
+        String lex = (s.value instanceof Token)
+            ? ((Token) s.value).getValor()
+            : (s.value != null ? s.value.toString() : "EOF");
+        erroresSintacticos.add("Error fatal en linea " +
+            s.left + ", columna " + s.right +
+            ". No se pudo recuperar. Token: [" + lex + "]");
+    }
+:};
+
+expect 5;
+
+/* ════════════════════════════════════════════════
+   TERMINALES
+   ════════════════════════════════════════════════ */
+terminal Token PRONOMBRE;
+terminal Token VERBO;
+terminal Token SUSTANTIVO;
+terminal Token ARTICULO;
+terminal Token ADJETIVO;
+terminal Token ADVERBIO;
+terminal Token PREPOSICION;
+terminal Token CONJUNCION;
+terminal Token CONTRACCION;
+terminal Token INTERJECCION;
+terminal Token PUNTO;
+terminal Token COMA;
+terminal Token INTERROGACION;
+terminal Token EXCLAMACION;
+
+/* ════════════════════════════════════════════════
+   NO TERMINALES
+   ════════════════════════════════════════════════ */
+non terminal NodoAST programa;
+non terminal NodoAST oracion;
+non terminal NodoAST fin_oracion;
+non terminal NodoAST predicado;
+non terminal NodoAST lista_mods;
+non terminal NodoAST modificador;
+non terminal NodoAST nucleo_verbal;
+non terminal NodoAST frase_nominal;
+non terminal NodoAST lista_elementos;
+non terminal NodoAST elemento;
+non terminal NodoAST complemento;
+non terminal NodoAST fragmento;
+non terminal NodoAST oracion_compuesta;
+
+/* ════════════════════════════════════════════════
+   PRECEDENCIA (menor a mayor)
+   ════════════════════════════════════════════════ */
+precedence left CONJUNCION;
+precedence left COMA;
+precedence left ADVERBIO;
+precedence left ADJETIVO;
+precedence left PREPOSICION;
+precedence left SUSTANTIVO, PRONOMBRE;
+precedence left ARTICULO;
+precedence left VERBO;
+precedence left PUNTO, INTERROGACION, EXCLAMACION;
+
+start with programa;
+
+/* ════════════════════════════════════════════════
+   PROGRAMA — una o mas oraciones
+   ════════════════════════════════════════════════ */
+programa
+    ::= oracion:o
+            {:
+                RESULT = o;
+                parser.resultadoAST = o;
+            :}
+    |   programa:p oracion:o
+            {:
+                RESULT = new NodoAST("PROGRAMA", p, o);
+                parser.resultadoAST = RESULT;
+            :}
+    ;
+
+/* ════════════════════════════════════════════════
+   ORACION
+   Cubre:
+     - oracion simple:   sujeto + predicado + puntuacion
+     - oracion compuesta: dos clausulas unidas por coma+conjuncion
+     - interjeccion sola: "Hola." / "Oh!"
+     - fragmento:         palabras sin verbo (tolerancia)
+   ════════════════════════════════════════════════ */
+oracion
+    /* Oracion simple normal */
+    ::= frase_nominal:fn predicado:p fin_oracion:f
+            {: RESULT = new NodoAST("ORACION", fn, p, f); :}
+
+    /* Oracion compuesta: "Ella canta, y el baila." */
+    |   frase_nominal:fn predicado:p COMA CONJUNCION:c frase_nominal:fn2 predicado:p2 fin_oracion:f
+            {: RESULT = new NodoAST("ORACION_COMPUESTA",
+                fn, p,
+                new NodoAST("CONJUNCION", c.getValor()),
+                fn2, p2, f); :}
+
+    /* Interjeccion: "Hola." / "Oh!" */
+    |   INTERJECCION:i fin_oracion:f
+            {: RESULT = new NodoAST("INTERJECCION", i.getValor()); :}
+
+    /* Fragmento con puntuacion */
+    |   fragmento:fr fin_oracion:f
+            {: RESULT = new NodoAST("FRAGMENTO", fr, f); :}
+
+    /* Fragmento sin puntuacion (tolerancia maxima) */
+    |   fragmento:fr
+            {: RESULT = new NodoAST("FRAGMENTO", fr); :}
+    ;
+
+/* ════════════════════════════════════════════════
+   FRAGMENTO — cualquier secuencia sin verbo principal
+   Permite que el parser no colapse ante entradas parciales
+   ════════════════════════════════════════════════ */
+fragmento
+    ::= frase_nominal:fn
+            {: RESULT = fn; :}
+    |   ADJETIVO:adj
+            {: RESULT = new NodoAST("ADJETIVO", adj.getValor()); :}
+    |   ADVERBIO:adv
+            {: RESULT = new NodoAST("ADVERBIO", adv.getValor()); :}
+    |   CONJUNCION:c
+            {: RESULT = new NodoAST("CONJUNCION", c.getValor()); :}
+    |   PREPOSICION:p
+            {: RESULT = new NodoAST("PREPOSICION", p.getValor()); :}
+    |   CONTRACCION:c
+            {: RESULT = new NodoAST("CONTRACCION", c.getValor()); :}
+    |   fragmento:fr ADJETIVO:adj
+            {: RESULT = new NodoAST("FRAGMENTO", fr,
+               new NodoAST("ADJETIVO", adj.getValor())); :}
+    |   fragmento:fr ADVERBIO:adv
+            {: RESULT = new NodoAST("FRAGMENTO", fr,
+               new NodoAST("ADVERBIO", adv.getValor())); :}
+    |   fragmento:fr SUSTANTIVO:n
+            {: RESULT = new NodoAST("FRAGMENTO", fr,
+               new NodoAST("SUSTANTIVO", n.getValor())); :}
+    ;
+
+/* ════════════════════════════════════════════════
+   FIN DE ORACION
+   ════════════════════════════════════════════════ */
+fin_oracion
+    ::= PUNTO:p
+            {: RESULT = new NodoAST("PUNTO", "."); :}
+    |   INTERROGACION:i
+            {: RESULT = new NodoAST("INTERROGACION", "?"); :}
+    |   EXCLAMACION:e
+            {: RESULT = new NodoAST("EXCLAMACION", "!"); :}
+    ;
+
+/* ════════════════════════════════════════════════
+   PREDICADO — verbo + modificadores opcionales
+   ════════════════════════════════════════════════ */
+predicado
+    ::= nucleo_verbal:nv
+            {: RESULT = new NodoAST("PREDICADO", nv); :}
+    |   predicado:p lista_mods:lm
+            {: RESULT = new NodoAST("PREDICADO", p, lm); :}
+    ;
+
+lista_mods
+    ::= modificador:m
+            {: RESULT = m; :}
+    |   lista_mods:lm modificador:m
+            {: RESULT = new NodoAST("MODIFICADORES", lm, m); :}
+    ;
+
+modificador
+    ::= frase_nominal:fn
+            {: RESULT = new NodoAST("OBJETO_DIRECTO", fn); :}
+    |   complemento:c
+            {: RESULT = c; :}
+    |   ADVERBIO:adv
+            {: RESULT = new NodoAST("ADVERBIO", adv.getValor()); :}
+    |   ADJETIVO:adj
+            {: RESULT = new NodoAST("ADJETIVO", adj.getValor()); :}
+    |   CONJUNCION:conj frase_nominal:fn
+            {: RESULT = new NodoAST("COORD", conj.getValor(), fn); :}
+    ;
+
+/* ════════════════════════════════════════════════
+   NUCLEO VERBAL
+   Cubre: verbo simple, verbos auxiliares, negacion
+   ════════════════════════════════════════════════ */
+nucleo_verbal
+    ::= VERBO:v
+            {: RESULT = new NodoAST("VERBO", v.getValor()); :}
+    |   nucleo_verbal:nv VERBO:v
+            {: RESULT = new NodoAST("NUCLEO_VERBAL", nv, v.getValor()); :}
+    |   ADVERBIO:adv VERBO:v
+            {: RESULT = new NodoAST("VERBO_NEG", adv.getValor(), v.getValor()); :}
+    ;
+
+/* ════════════════════════════════════════════════
+   FRASE NOMINAL
+   ════════════════════════════════════════════════ */
+frase_nominal
+    ::= lista_elementos:le
+            {: RESULT = new NodoAST("FRASE_NOMINAL", le); :}
+    ;
+
+lista_elementos
+    ::= elemento:e
+            {: RESULT = e; :}
+    |   lista_elementos:le CONJUNCION:c elemento:e
+            {: RESULT = new NodoAST("LISTA_COORD", le,
+               new NodoAST("CONJUNCION", c.getValor()), e); :}
+    ;
+
+/* ════════════════════════════════════════════════
+   ELEMENTO — nucleo de la frase nominal
+   FIX CLAVE: se agregaron variantes con adjetivo
+   POSTNOMINAL para cubrir el orden espanol:
+     "un libro nuevo"  -> ARTICULO SUSTANTIVO ADJETIVO
+     "la casa hermosa" -> ARTICULO SUSTANTIVO ADJETIVO
+   ════════════════════════════════════════════════ */
+elemento
+    /* Solo sustantivo o pronombre */
+    ::= SUSTANTIVO:n
+            {: RESULT = new NodoAST("SUSTANTIVO", n.getValor()); :}
+    |   PRONOMBRE:p
+            {: RESULT = new NodoAST("PRONOMBRE", p.getValor()); :}
+
+    /* Articulo + sustantivo (sin adjetivo) */
+    |   ARTICULO:a SUSTANTIVO:n
+            {: RESULT = new NodoAST("DET_N", a.getValor(), n.getValor()); :}
+
+    /* Adjetivo prenominal: "un buen libro" */
+    |   ARTICULO:a ADJETIVO:adj SUSTANTIVO:n
+            {: RESULT = new NodoAST("DET_ADJ_N",
+               a.getValor(), adj.getValor(), n.getValor()); :}
+
+    /* Dos adjetivos prenominales: "un gran buen hombre" */
+    |   ARTICULO:a ADJETIVO:adj1 ADJETIVO:adj2 SUSTANTIVO:n
+            {: RESULT = new NodoAST("DET_ADJ_ADJ_N",
+               a.getValor(), adj1.getValor(),
+               adj2.getValor(), n.getValor()); :}
+
+    /* ── FIX: Adjetivo POSTNOMINAL (orden espanol) ──────────────
+       "un libro nuevo"     -> ARTICULO SUSTANTIVO ADJETIVO
+       "la casa hermosa"    -> ARTICULO SUSTANTIVO ADJETIVO
+       "el gato pequeno"    -> ARTICULO SUSTANTIVO ADJETIVO        */
+    |   ARTICULO:a SUSTANTIVO:n ADJETIVO:adj
+            {: RESULT = new NodoAST("DET_N_ADJ",
+               a.getValor(), n.getValor(), adj.getValor()); :}
+
+    /* "un libro nuevo viejo" -> dos adjetivos postnominales */
+    |   ARTICULO:a SUSTANTIVO:n ADJETIVO:adj1 ADJETIVO:adj2
+            {: RESULT = new NodoAST("DET_N_ADJ_ADJ",
+               a.getValor(), n.getValor(),
+               adj1.getValor(), adj2.getValor()); :}
+
+    /* Adjetivo solo antes de sustantivo sin articulo: "buen libro" */
+    |   ADJETIVO:adj SUSTANTIVO:n
+            {: RESULT = new NodoAST("ADJ_N",
+               adj.getValor(), n.getValor()); :}
+
+    /* Articulo + pronombre: "el mismo" */
+    |   ARTICULO:a PRONOMBRE:p
+            {: RESULT = new NodoAST("DET_PRON",
+               a.getValor(), p.getValor()); :}
+
+    /* Contraccion como nucleo nominal: "del parque" ya viene
+       como un solo token CONTRACCION desde el lexico           */
+    |   CONTRACCION:c SUSTANTIVO:n
+            {: RESULT = new NodoAST("CONTRAC_N",
+               c.getValor(), n.getValor()); :}
+    ;
+
+/* ════════════════════════════════════════════════
+   COMPLEMENTO PREPOSITIONAL
+   "en la ciudad", "al parque", "de ellos"
+   ════════════════════════════════════════════════ */
+complemento
+    ::= PREPOSICION:prep frase_nominal:fn
+            {: RESULT = new NodoAST("COMPLEMENTO",
+               prep.getValor(), fn); :}
+    |   PREPOSICION:prep PRONOMBRE:pron
+            {: RESULT = new NodoAST("COMPLEMENTO",
+               prep.getValor(), pron.getValor()); :}
+    |   PREPOSICION:prep ADVERBIO:adv
+            {: RESULT = new NodoAST("COMPLEMENTO",
+               prep.getValor(), adv.getValor()); :}
+    |   PREPOSICION:prep VERBO:v
+            {: RESULT = new NodoAST("COMPLEMENTO",
+               prep.getValor(), v.getValor()); :}
+    |   PREPOSICION:prep ARTICULO:a SUSTANTIVO:n
+            {: RESULT = new NodoAST("COMPLEMENTO",
+               prep.getValor(), a.getValor(), n.getValor()); :}
+    |   PREPOSICION:prep ARTICULO:a ADJETIVO:adj SUSTANTIVO:n
+            {: RESULT = new NodoAST("COMPLEMENTO",
+               prep.getValor(), a.getValor(),
+               adj.getValor(), n.getValor()); :}
+    /* FIX: "en la ciudad hermosa" -> PREP ART SUST ADJ */
+    |   PREPOSICION:prep ARTICULO:a SUSTANTIVO:n ADJETIVO:adj
+            {: RESULT = new NodoAST("COMPLEMENTO",
+               prep.getValor(), a.getValor(),
+               n.getValor(), adj.getValor()); :}
+    /* CONTRACCION como prep compuesta: "al parque" */
+    |   CONTRACCION:c frase_nominal:fn
+            {: RESULT = new NodoAST("COMPLEMENTO",
+               c.getValor(), fn); :}
+    |   CONTRACCION:c SUSTANTIVO:n
+            {: RESULT = new NodoAST("COMPLEMENTO",
+               c.getValor(), n.getValor()); :}
+    ;
