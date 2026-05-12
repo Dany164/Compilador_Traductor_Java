@@ -12,7 +12,7 @@ function App() {
         <Translator />
       </main>
       <footer>
-        <p>Universidad Mariano Gálvez — Compiladores 2026</p>
+        <p>Universidad Mariano Gálvez - Compiladores 2026</p>
       </footer>
     </div>
   );

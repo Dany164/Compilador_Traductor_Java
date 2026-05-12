@@ -210,7 +210,9 @@ public class AnalizadorSemantico {
                     boolean sigValido = PUEDE_SER_OBJETO.contains(sig.getTipo())
                             || TIPOS_ARTICULO.contains(sig.getTipo())
                             || TIPOS_PRONOMBRE.contains(sig.getTipo())
-                            || TIPOS_ADJETIVO.contains(sig.getTipo());
+                            || TIPOS_ADJETIVO.contains(sig.getTipo())
+                            || sig.getTipo().equals("POSESIVO")
+                            || sig.getTipo().equals("CONTRACCION");
                     if (!sigValido) {
                         agregarToken(sig,
                                 "Después de la preposición '" + t.getValor() +

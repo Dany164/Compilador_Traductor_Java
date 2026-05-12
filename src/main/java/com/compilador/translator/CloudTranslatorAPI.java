@@ -10,6 +10,8 @@ import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.nio.charset.StandardCharsets;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Traductor usando Cloud Translator API (Azure Translator o similar)
@@ -102,19 +104,15 @@ public class CloudTranslatorAPI {
     }
 
     /**
-     * Traducción usando Google Cloud Translation API
+     * Traducción usando Google Cloud Translation API (v2)
      */
     private String traducirGoogle(String texto, String desde, String hacia) throws Exception {
-        // Google Cloud Translation v2 API
-        // Parámetros: key, q (texto), target (obligatorio), source (opcional)
-
+        // Usamos GET con URLEncoder para máxima compatibilidad con llaves de API estándar
         String url = "https://translation.googleapis.com/language/translate/v2"
-                + "?key=" + java.net.URLEncoder.encode(apiKey, StandardCharsets.UTF_8)
+                + "?key=" + apiKey
                 + "&source=" + java.net.URLEncoder.encode(desde, StandardCharsets.UTF_8)
                 + "&target=" + java.net.URLEncoder.encode(hacia, StandardCharsets.UTF_8)
                 + "&q=" + java.net.URLEncoder.encode(texto, StandardCharsets.UTF_8);
-
-        System.out.println("   [DEBUG] URL: " + url.replaceAll("key=[^&]*", "key=***"));
 
         HttpRequest request = HttpRequest.newBuilder()
                 .uri(URI.create(url))
@@ -124,8 +122,6 @@ public class CloudTranslatorAPI {
         HttpResponse<String> response = httpClient.send(request,
                 HttpResponse.BodyHandlers.ofString());
 
-        System.out.println("   [DEBUG] Response: " + response.body());
-
         if (response.statusCode() == 200) {
             JsonNode root = mapper.readTree(response.body());
             JsonNode data = root.path("data");
@@ -133,15 +129,23 @@ public class CloudTranslatorAPI {
                 JsonNode translations = data.path("translations");
                 if (translations.isArray() && translations.size() > 0) {
                     String traduccion = translations.get(0).path("translatedText").asText(null);
-                    return (traduccion != null && !traduccion.isBlank()) ? traduccion : null;
+                    return (traduccion != null) ? limpiarHtml(traduccion) : null;
                 }
             }
         } else {
-            System.out.println("⚠️ Google Translator status: " + response.statusCode());
-            System.out.println("   Error response: " + response.body());
+            System.out.println("❌ Error Google Translate API (Status " + response.statusCode() + ")");
+            System.out.println("   Respuesta: " + response.body());
         }
 
         return null;
+    }
+
+    private String limpiarHtml(String texto) {
+        return texto.replace("&quot;", "\"")
+                    .replace("&#39;", "'")
+                    .replace("&amp;", "&")
+                    .replace("&lt;", "<")
+                    .replace("&gt;", ">");
     }
 
     /**

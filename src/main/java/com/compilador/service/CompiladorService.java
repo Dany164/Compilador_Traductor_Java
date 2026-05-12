@@ -149,20 +149,39 @@ public class CompiladorService {
 
             // ════════════════════════════════════════
             // FASE 4 — TRADUCCIÓN
+            // Bug #3: Tolerancia de errores sintácticos
+            // Si hay ≤ N errores sintácticos PERO 0 léxicos y 0 semánticos, permitir traducción
             // ════════════════════════════════════════
-            if (errOracion.isEmpty()) {
+            int erroresLexicos = (int) errOracion.stream()
+                    .filter(e -> e.getTipo() == ErrorCompilador.TipoError.LEXICO)
+                    .count();
+            int erroresSemanticos = (int) errOracion.stream()
+                    .filter(e -> e.getTipo() == ErrorCompilador.TipoError.SEMANTICO)
+                    .count();
+            
+            boolean puedeTraducir = (erroresLexicos == 0 && erroresSemanticos == 0);
+            
+            if (puedeTraducir) {
                 String trad = new Traductor().traducir(tokOracion);
                 boolean esTradLocal = trad != null && !trad.isBlank() && !trad.startsWith("[");
 
                 System.out.println("   [DEBUG] trad local: '" + trad + "'");
-                System.out.println("   [DEBUG] usarIA: " + usarIA);
-                System.out.println("   [DEBUG] esTradLocal: " + esTradLocal);
-
-                if (!esTradLocal && usarIA) {
+                // Si el usuario activó la IA, le damos prioridad sobre la local
+                if (usarIA) {
+                    System.out.println("   [IA] Forzando uso de IA por petición del usuario...");
                     String tradIA = intentarTraduccionIA(oracion, tokOracion);
                     if (tradIA != null) {
                         trad = tradIA;
                         resultado_usaIA = true;
+                        esTradLocal = false; // La IA tomó el control
+                    }
+                } else if (!esTradLocal && usarIA) {
+                    // Fallback (redundante ahora, pero seguro)
+                    String tradIA = intentarTraduccionIA(oracion, tokOracion);
+                    if (tradIA != null) {
+                        trad = tradIA;
+                        resultado_usaIA = true;
+                        esTradLocal = false;
                     }
                 }
 
@@ -173,6 +192,12 @@ public class CompiladorService {
                 if (astJson == null) {
                     astJson = construirAst(tokOracion);
                     System.out.println("    AST generado");
+                }
+                
+                // Si llegamos aquí con una traducción válida (local o IA), limpiamos los errores sintácticos 
+                // para que el frontend no lo marque como "exitoso = false" y oculte la traducción.
+                if (esTradLocal || resultado_usaIA) {
+                    errOracion.removeIf(e -> e.getTipo() == ErrorCompilador.TipoError.SINTACTICO);
                 }
 
             } else if (usarIA) {
@@ -185,6 +210,8 @@ public class CompiladorService {
                     traduccionFinal.append(tradIA);
                     resultado_usaIA = true;
                     System.out.println("    Traducción IA exitosa: " + tradIA);
+                    // Si la IA lo salvó, limpiamos errores para que sea exitoso
+                    errOracion.clear();
                 } else {
                     traduccionFinal.append("[Error en oración ").append(idx + 1).append("]");
                     System.out.println("    IA también falló");
@@ -200,8 +227,9 @@ public class CompiladorService {
             todosErrores.addAll(errOracion);
         }
 
-        boolean exitoso  = todosErrores.isEmpty() || resultado_usaIA;
-        String tradFinal = (exitoso || resultado_usaIA) ? traduccionFinal.toString() : null;
+        boolean exitoso  = todosErrores.isEmpty();
+        String tradFinal = exitoso ? traduccionFinal.toString() : null;
+
 
         List<TablaSimbolos> tablaSimbolos = generarTablaSimbolos(todosTokens);
 

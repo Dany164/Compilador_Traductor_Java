@@ -17,12 +17,14 @@ function TokensTable({ tokens }) {
         </thead>
         <tbody>
           {tokens.map((token, i) => (
-            <tr key={i}>
+            <tr key={`${token.valor}-${token.linea}-${token.columna}-${i}`}>
               <td>{i + 1}</td>
               <td><strong>{token.valor}</strong></td>
-              <td><span className={`badge badge-${token.tipo.toLowerCase()}`}>
-                {token.tipo}
-              </span></td>
+              <td>
+                <span className={`badge badge-${token.tipo.toLowerCase()}`}>
+                  {token.tipo}
+                </span>
+              </td>
               <td>{token.traduccion}</td>
               <td>{token.linea}</td>
               <td>{token.columna}</td>

@@ -813,7 +813,7 @@ public class Diccionario {
         add("cosa", "SUSTANTIVO", "thing");
         add("persona", "SUSTANTIVO", "person");
         add("personas", "SUSTANTIVO", "people");
-        add("juego", "SUSTANTIVO", "game");
+        // 'juego' es VERBO (yo juego = I play). 'game' en EN ya mapea a su propio sustantivo.
         add("equipo", "SUSTANTIVO", "team");
         add("año", "SUSTANTIVO", "year");
         add("anio", "SUSTANTIVO", "year");
@@ -1581,7 +1581,8 @@ public class Diccionario {
         add("iban", "VERBO", "were going");
         add("íbamos", "VERBO", "were going");
         add("ibamos", "VERBO", "were going");
-        add("he", "VERBO", "have");
+        // Fix: 'he' eliminado aquí para no sobreescribir el PRONOMBRE_PERSONAL 'he' (inglés)
+        // El auxiliar español 'he' se deduce del contexto cuando 'hemos/han' también están presentes.
         add("has", "VERBO", "has");
         add("hemos", "VERBO", "have");
         add("han", "VERBO", "have");
@@ -1855,7 +1856,12 @@ public class Diccionario {
     public static String traducir(String palabra) {
         String clave = normalizarClave(palabra);
         String[] e = mapa.get(clave);
-        return e != null ? e[1] : palabra;
+        String resultado = e != null ? e[1] : palabra;
+        // Bug #5: Limpiar traducciones con / tomando el primer elemento
+        if (resultado != null && resultado.contains("/")) {
+            resultado = resultado.split("/")[0];
+        }
+        return resultado;
     }
 
     public static String traducirSegunIdioma(String palabra, String idiomaOrigen) {
@@ -1959,7 +1965,7 @@ public class Diccionario {
                     "CONJUNCION_SUSTANTIVA" ->
                 sym.CONJUNCION;
             case "CONTRACCION" -> sym.CONTRACCION;
-            case "INTERJECCION" -> sym.SUSTANTIVO;
+
             default -> sym.SUSTANTIVO;
         };
     }

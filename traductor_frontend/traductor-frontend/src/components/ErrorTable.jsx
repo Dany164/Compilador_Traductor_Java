@@ -2,9 +2,9 @@ function ErrorTable({ errores }) {
   if (!errores || errores.length === 0) return null;
 
   const colorTipo = {
-    LEXICO:    "#e74c3c",
-    SINTACTICO:"#e67e22",
-    SEMANTICO: "#9b59b6"
+    LEXICO:     "#e74c3c",
+    SINTACTICO: "#e67e22",
+    SEMANTICO:  "#9b59b6"
   };
 
   return (
@@ -22,15 +22,15 @@ function ErrorTable({ errores }) {
         </thead>
         <tbody>
           {errores.map((error, i) => (
-            <tr key={i}>
+            <tr key={`${error.tipo}-${error.linea}-${error.columna}-${i}`}>
               <td>{i + 1}</td>
               <td>
                 <span style={{
-                  background: colorTipo[error.tipo] || "#555",
-                  color: "white",
-                  padding: "2px 8px",
+                  background:   colorTipo[error.tipo] || "#555",
+                  color:        "white",
+                  padding:      "2px 8px",
                   borderRadius: "4px",
-                  fontSize: "0.8rem"
+                  fontSize:     "0.8rem"
                 }}>
                   {error.tipo}
                 </span>
