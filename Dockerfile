@@ -11,8 +11,8 @@ FROM eclipse-temurin:17-jre
 WORKDIR /app
 COPY --from=build /app/target/traductor-1.0-SNAPSHOT.jar app.jar
 
-ENV PORT=8080
-EXPOSE 8080
+# El puerto lo asigna Render dinámicamente mediante la variable PORT
+EXPOSE ${PORT}
 
 ENTRYPOINT ["java", "-jar", "app.jar"]
 
