@@ -1,6 +1,8 @@
 package com.compilador.service;
 
 import com.compilador.ast.NodoAST;
+import com.compilador.dto.TraducirRequest;
+import com.compilador.dto.TraducirResponse;
 import com.compilador.lexer.Diccionario;
 import com.compilador.lexer.Lexer;
 import com.compilador.lexer.Token;
@@ -28,6 +30,67 @@ public class CompiladorService {
     @Autowired
     private CloudTranslatorAPI cloudTranslatorAPI;
 
+    public TraducirResponse traducirTextoLibre(TraducirRequest request) {
+        String texto = request != null && request.getTexto() != null
+                ? request.getTexto().trim()
+                : "";
+
+        if (texto.isBlank()) {
+            return new TraducirResponse(
+                    false,
+                    texto,
+                    null,
+                    null,
+                    null,
+                    cloudTranslatorAPI.getProvider(),
+                    "El texto no puede estar vacio.");
+        }
+
+        String desde = request != null ? request.getDesde() : null;
+        String hacia = request != null ? request.getHacia() : null;
+        boolean usarMotorCloud = request == null || request.isUsarIA();
+        String idiomaOrigen = cloudTranslatorAPI.resolverIdiomaOrigen(texto, desde);
+        String idiomaDestino = cloudTranslatorAPI.resolverIdiomaDestino(idiomaOrigen, hacia);
+        List<Diccionario.Entrada> entradas = Diccionario.consultarTexto(texto, idiomaOrigen);
+        String traduccionDiccionario = Diccionario.traducirTexto(texto, idiomaOrigen);
+        String traduccion = usarMotorCloud && cloudTranslatorAPI.estaConfigurado()
+                ? cloudTranslatorAPI.traducir(texto, idiomaOrigen, idiomaDestino)
+                : null;
+
+        String provider = usarMotorCloud && cloudTranslatorAPI.estaConfigurado() ? cloudTranslatorAPI.getProvider() : "diccionario";
+        String mensaje;
+        if (traduccion != null && !traduccion.isBlank()) {
+            mensaje = "Traduccion realizada con Google Translate y respaldada por el diccionario local.";
+        } else {
+            traduccion = traduccionDiccionario;
+            provider = "diccionario";
+            mensaje = usarMotorCloud && cloudTranslatorAPI.estaConfigurado()
+                    ? "Google Translate no respondio; se devolvio la traduccion del diccionario local."
+                    : "Traduccion realizada con el diccionario local.";
+        }
+
+        boolean exitoso = traduccion != null && !traduccion.isBlank();
+        return new TraducirResponse(
+                exitoso,
+                texto,
+                traduccion,
+                traduccionDiccionario,
+                idiomaOrigen,
+                idiomaDestino,
+                provider,
+                exitoso ? mensaje : "No se pudo traducir el texto.",
+                entradas);
+    }
+
+    public List<Diccionario.Entrada> consultarDiccionario(TraducirRequest request) {
+        String texto = request != null && request.getTexto() != null
+                ? request.getTexto().trim()
+                : "";
+        String desde = request != null ? request.getDesde() : null;
+        String idiomaOrigen = cloudTranslatorAPI.resolverIdiomaOrigen(texto, desde);
+        return Diccionario.consultarTexto(texto, idiomaOrigen);
+    }
+
     // ════════════════════════════════════════════════════════
     // Método auxiliar: crea un Reader UTF-8 desde un String.
     // Garantiza que JFlex reciba siempre un flujo UTF-8 limpio,
@@ -45,11 +108,27 @@ public class CompiladorService {
         StringBuilder traduccionFinal  = new StringBuilder();
         boolean resultado_usaIA        = false;
         String astJson                 = null;
+        String textoOriginal           = texto == null ? "" : texto.trim();
+        String traduccionProfesional   = null;
+        boolean usarMotorProfesional   = usarIA && cloudTranslatorAPI.estaConfigurado();
 
-        String[] oraciones = texto.split("(?<=[.!?])\\s*");
+        if (textoOriginal.isBlank()) {
+            ResultadoAnalisis resultado = new ResultadoAnalisis(
+                    todosTokens, new ArrayList<>(), todosErrores,
+                    "", null, true);
+            resultado.setUsoIA(false);
+            return resultado;
+        }
+
+        if (usarMotorProfesional) {
+            traduccionProfesional = intentarTraduccionIA(textoOriginal);
+            resultado_usaIA = traduccionProfesional != null && !traduccionProfesional.isBlank();
+        }
+
+        String[] oraciones = textoOriginal.split("(?<=[.!?])\\s*");
         if (oraciones.length == 0 ||
-                (oraciones.length == 1 && !texto.matches(".*[.!?].*"))) {
-            oraciones = new String[]{ texto.trim() };
+                (oraciones.length == 1 && !textoOriginal.matches(".*[.!?].*"))) {
+            oraciones = new String[]{ textoOriginal };
         }
 
         for (int idx = 0; idx < oraciones.length; idx++) {
@@ -161,13 +240,18 @@ public class CompiladorService {
             
             boolean puedeTraducir = (erroresLexicos == 0 && erroresSemanticos == 0);
             
-            if (puedeTraducir) {
+            if (traduccionProfesional != null) {
+                if (astJson == null) {
+                    astJson = construirAst(tokOracion);
+                    System.out.println("    AST generado");
+                }
+            } else if (puedeTraducir) {
                 String trad = new Traductor().traducir(tokOracion);
                 boolean esTradLocal = trad != null && !trad.isBlank() && !trad.startsWith("[");
 
                 System.out.println("   [DEBUG] trad local: '" + trad + "'");
                 // Si el usuario activó la IA, le damos prioridad sobre la local
-                if (usarIA) {
+                if (usarMotorProfesional && traduccionProfesional == null) {
                     System.out.println("   [IA] Forzando uso de IA por petición del usuario...");
                     String tradIA = intentarTraduccionIA(oracion, tokOracion);
                     if (tradIA != null) {
@@ -175,7 +259,7 @@ public class CompiladorService {
                         resultado_usaIA = true;
                         esTradLocal = false; // La IA tomó el control
                     }
-                } else if (!esTradLocal && usarIA) {
+                } else if (!esTradLocal && usarMotorProfesional && traduccionProfesional == null) {
                     // Fallback (redundante ahora, pero seguro)
                     String tradIA = intentarTraduccionIA(oracion, tokOracion);
                     if (tradIA != null) {
@@ -200,7 +284,7 @@ public class CompiladorService {
                     errOracion.removeIf(e -> e.getTipo() == ErrorCompilador.TipoError.SINTACTICO);
                 }
 
-            } else if (usarIA) {
+            } else if (usarMotorProfesional && traduccionProfesional == null) {
                 System.out.println("   [IA] Oración con errores, intentando IA...");
                 String tradIA = intentarTraduccionIA(oracion, tokOracion);
 
@@ -227,8 +311,15 @@ public class CompiladorService {
             todosErrores.addAll(errOracion);
         }
 
-        boolean exitoso  = todosErrores.isEmpty();
-        String tradFinal = exitoso ? traduccionFinal.toString() : null;
+        boolean tieneTraduccionProfesional = traduccionProfesional != null && !traduccionProfesional.isBlank();
+        if (tieneTraduccionProfesional) {
+            todosErrores.clear();
+        }
+
+        boolean exitoso  = tieneTraduccionProfesional || todosErrores.isEmpty();
+        String tradFinal = tieneTraduccionProfesional
+                ? traduccionProfesional
+                : (exitoso ? traduccionFinal.toString() : null);
 
 
         List<TablaSimbolos> tablaSimbolos = generarTablaSimbolos(todosTokens);
@@ -248,8 +339,21 @@ public class CompiladorService {
     // ════════════════════════════════════════
     // Helper: detecta idioma y llama a Cloud Translator API
     // ════════════════════════════════════════
+    private String intentarTraduccionIA(String texto) {
+        try {
+            return cloudTranslatorAPI.traducirBidireccional(texto);
+        } catch (Exception e) {
+            return null;
+        }
+    }
+
     private String intentarTraduccionIA(String oracion, List<Token> tokOracion) {
         try {
+            String trad = cloudTranslatorAPI.traducirBidireccional(oracion);
+            if (trad != null && !trad.isBlank()) {
+                return trad;
+            }
+
             String idioma = detectarIdioma(tokOracion, oracion);
             String desde  = idioma.equals("en") ? "en" : "es";
             String hacia  = idioma.equals("en") ? "es" : "en";
@@ -391,19 +495,6 @@ public class CompiladorService {
     }
 
     private String obtenerCategoria(String tipo) {
-        if (tipo.startsWith("PRONOMBRE"))   return "PRONOMBRE";
-        if (tipo.startsWith("VERBO"))       return "VERBO";
-        if (tipo.startsWith("SUSTANTIVO"))  return "SUSTANTIVO";
-        if (tipo.startsWith("ADJETIVO"))    return "ADJETIVO";
-        if (tipo.startsWith("ADVERBIO"))    return "ADVERBIO";
-        if (tipo.startsWith("ARTICULO"))    return "ARTICULO";
-        if (tipo.startsWith("CONJUNCION"))  return "CONJUNCION";
-        if (tipo.startsWith("PREPOSICION")) return "PREPOSICION";
-        if (tipo.startsWith("NUMERAL"))     return "NUMERAL";
-        if (tipo.equals("POSESIVO"))        return "DETERMINANTE";
-        if (tipo.equals("DEMOSTRATIVO"))    return "DETERMINANTE";
-        if (tipo.equals("CONTRACCION"))     return "CONTRACCION";
-        if (tipo.equals("INTERJECCION"))    return "INTERJECCION";
-        return "OTRO";
+        return Diccionario.categoria(tipo);
     }
 }

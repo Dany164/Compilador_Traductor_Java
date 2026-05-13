@@ -1,10 +1,12 @@
 package com.compilador.lexer;
 
 import com.compilador.parser.sym;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class Diccionario {
@@ -13,6 +15,7 @@ public class Diccionario {
     private static final Map<String, String> expresionCompactaAOriginal = new HashMap<>();
     private static final Map<String, String> traduccionesForzadasES_EN = new HashMap<>();
     private static final Map<String, String> traduccionesForzadasEN_ES = new HashMap<>();
+    private static final Pattern TOKEN_TEXTO = Pattern.compile("\\p{L}+(?:['’]\\p{L}+)?|\\d+|[^\\s]");
 
     private static final Set<String> MARCADORES_EN = Set.of(
             "the", "a", "an", "in", "on", "at", "with", "from", "to", "and", "or", "but",
@@ -21,6 +24,62 @@ public class Diccionario {
             "el", "la", "los", "las", "un", "una", "unos", "unas", "en", "con", "de", "por", "para",
             "y", "o", "pero", "es", "son", "fue", "eran", "yo", "tú", "tu", "él", "ella", "ellos", "nosotros",
             "hola", "gracias", "adiós", "adios");
+
+    public static class Entrada {
+
+        private final String palabra;
+        private final String normalizada;
+        private final String tipo;
+        private final String categoria;
+        private final String traduccion;
+        private final boolean conocida;
+        private final String origen;
+
+        public Entrada(
+                String palabra,
+                String normalizada,
+                String tipo,
+                String categoria,
+                String traduccion,
+                boolean conocida,
+                String origen) {
+            this.palabra = palabra;
+            this.normalizada = normalizada;
+            this.tipo = tipo;
+            this.categoria = categoria;
+            this.traduccion = traduccion;
+            this.conocida = conocida;
+            this.origen = origen;
+        }
+
+        public String getPalabra() {
+            return palabra;
+        }
+
+        public String getNormalizada() {
+            return normalizada;
+        }
+
+        public String getTipo() {
+            return tipo;
+        }
+
+        public String getCategoria() {
+            return categoria;
+        }
+
+        public String getTraduccion() {
+            return traduccion;
+        }
+
+        public boolean isConocida() {
+            return conocida;
+        }
+
+        public String getOrigen() {
+            return origen;
+        }
+    }
 
     static {
         /*
@@ -1718,6 +1777,8 @@ public class Diccionario {
          * ══════════════════════════════════
          */
         add("friend", "SUSTANTIVO", "amigo");
+        add("english", "ADJETIVO_CALIFICATIVO", "ingles");
+        add("grammar", "SUSTANTIVO", "gramatica");
         add("library", "SUSTANTIVO", "biblioteca");
         add("mountain", "SUSTANTIVO", "montaña");
         add("beach", "SUSTANTIVO", "playa");
@@ -1822,6 +1883,8 @@ public class Diccionario {
         add("periodico", "SUSTANTIVO", "newspaper");
         add("revista", "SUSTANTIVO", "magazine");
 
+        cargarVocabularioLocalAmpliado();
+
         // Traducciones forzadas para términos frecuentes y ambiguos.
         traduccionesForzadasES_EN.put("hola", "hello");
         traduccionesForzadasES_EN.put("adiós", "goodbye");
@@ -1847,10 +1910,517 @@ public class Diccionario {
         }
     }
 
+    private static void addBidireccionales(String tipo, String[][] pares) {
+        for (String[] par : pares) {
+            add(par[0], tipo, par[1]);
+            add(par[1], tipo, par[0]);
+        }
+    }
+
+    private static void cargarVocabularioLocalAmpliado() {
+        /*
+         * Refuerzo del diccionario local para cubrir palabras de uso academico,
+         * tecnologico y cotidiano sin salir de esta misma clase.
+         */
+        addBidireccionales("SUSTANTIVO", new String[][] {
+                {"computer", "computadora"},
+                {"laptop", "computadora portatil"},
+                {"keyboard", "teclado"},
+                {"mouse", "raton"},
+                {"screen", "pantalla"},
+                {"monitor", "monitor"},
+                {"printer", "impresora"},
+                {"camera", "camara"},
+                {"microphone", "microfono"},
+                {"speaker", "bocina"},
+                {"volume", "volumen"},
+                {"file", "archivo"},
+                {"folder", "carpeta"},
+                {"document", "documento"},
+                {"image", "imagen"},
+                {"video", "video"},
+                {"audio", "audio"},
+                {"network", "red"},
+                {"internet", "internet"},
+                {"website", "sitio web"},
+                {"web page", "pagina web"},
+                {"server", "servidor"},
+                {"client", "cliente"},
+                {"database", "base de datos"},
+                {"data base", "base de datos"},
+                {"source code", "codigo fuente"},
+                {"code", "codigo"},
+                {"program", "programa"},
+                {"application", "aplicacion"},
+                {"app", "aplicacion"},
+                {"software", "software"},
+                {"hardware", "hardware"},
+                {"system", "sistema"},
+                {"user", "usuario"},
+                {"password", "contrasena"},
+                {"account", "cuenta"},
+                {"project", "proyecto"},
+                {"task", "tarea"},
+                {"error", "error"},
+                {"result", "resultado"},
+                {"translation", "traduccion"},
+                {"translator", "traductor"},
+                {"dictionary", "diccionario"},
+                {"language", "idioma"},
+                {"word", "palabra"},
+                {"sentence", "oracion"},
+                {"paragraph", "parrafo"},
+                {"text", "texto"},
+                {"grammar rule", "regla gramatical"},
+                {"pronunciation", "pronunciacion"},
+                {"voice", "voz"},
+                {"command", "comando"},
+                {"school", "escuela"},
+                {"university", "universidad"},
+                {"class", "clase"},
+                {"course", "curso"},
+                {"teacher", "maestro"},
+                {"professor", "profesor"},
+                {"student", "estudiante"},
+                {"homework", "tarea"},
+                {"exam", "examen"},
+                {"grade", "calificacion"},
+                {"notebook", "cuaderno"},
+                {"pencil", "lapiz"},
+                {"pen", "lapicero"},
+                {"desk", "escritorio"},
+                {"board", "pizarra"},
+                {"lesson", "leccion"},
+                {"question", "pregunta"},
+                {"answer", "respuesta"},
+                {"explanation", "explicacion"},
+                {"company", "empresa"},
+                {"customer", "cliente"},
+                {"product", "producto"},
+                {"price", "precio"},
+                {"sale", "venta"},
+                {"purchase", "compra"},
+                {"store", "tienda"},
+                {"market", "mercado"},
+                {"invoice", "factura"},
+                {"payment", "pago"},
+                {"money", "dinero"},
+                {"bank", "banco"},
+                {"job", "trabajo"},
+                {"meeting", "reunion"},
+                {"report", "reporte"},
+                {"schedule", "horario"},
+                {"house", "casa"},
+                {"room", "habitacion"},
+                {"kitchen", "cocina"},
+                {"bathroom", "bano"},
+                {"door", "puerta"},
+                {"window", "ventana"},
+                {"table", "mesa"},
+                {"chair", "silla"},
+                {"bed", "cama"},
+                {"car", "carro"},
+                {"bus", "bus"},
+                {"street", "calle"},
+                {"city", "ciudad"},
+                {"country", "pais"},
+                {"family", "familia"},
+                {"mother", "madre"},
+                {"father", "padre"},
+                {"brother", "hermano"},
+                {"sister", "hermana"},
+                {"child", "nino"},
+                {"food", "comida"},
+                {"water", "agua"},
+                {"coffee", "cafe"},
+                {"tea", "te"},
+                {"bread", "pan"},
+                {"rice", "arroz"},
+                {"meat", "carne"},
+                {"chicken", "pollo"},
+                {"fish", "pescado"},
+                {"fruit", "fruta"},
+                {"apple", "manzana"},
+                {"banana", "banano"},
+                {"vegetable", "vegetal"},
+                {"milk", "leche"},
+                {"sugar", "azucar"},
+                {"salt", "sal"},
+                {"breakfast", "desayuno"},
+                {"lunch", "almuerzo"},
+                {"dinner", "cena"},
+                {"doctor", "doctor"},
+                {"hospital", "hospital"},
+                {"medicine", "medicina"},
+                {"pain", "dolor"},
+                {"fever", "fiebre"},
+                {"cough", "tos"},
+                {"headache", "dolor de cabeza"},
+                {"airport", "aeropuerto"},
+                {"hotel", "hotel"},
+                {"ticket", "boleto"},
+                {"trip", "viaje"},
+                {"map", "mapa"},
+                {"time", "tiempo"},
+                {"hour", "hora"},
+                {"minute", "minuto"},
+                {"second", "segundo"},
+                {"day", "dia"},
+                {"week", "semana"},
+                {"month", "mes"},
+                {"year", "ano"},
+                {"morning", "manana"},
+                {"afternoon", "tarde"},
+                {"night", "noche"},
+                {"weather", "clima"},
+                {"rain", "lluvia"},
+                {"sun", "sol"},
+                {"cloud", "nube"},
+                {"wind", "viento"},
+                {"heat", "calor"},
+                {"cold", "frio"},
+                {"frontend", "frontend"},
+                {"backend", "backend"},
+                {"interface", "interfaz"},
+                {"user interface", "interfaz de usuario"},
+                {"artificial intelligence", "inteligencia artificial"},
+                {"machine learning", "aprendizaje automatico"},
+                {"spring boot", "spring boot"},
+                {"react", "react"},
+                {"browser", "navegador"},
+                {"deployment", "despliegue"},
+                {"hosting", "alojamiento"},
+                {"domain", "dominio"},
+                {"port", "puerto"},
+                {"request", "solicitud"},
+                {"response", "respuesta"},
+                {"connection", "conexion"},
+                {"permission", "permiso"},
+                {"status", "estado"},
+                {"configuration", "configuracion"},
+                {"environment", "entorno"},
+                {"key", "clave"},
+                {"api key", "clave api"},
+                {"token", "token"},
+                {"security", "seguridad"},
+                {"version", "version"}
+        });
+
+        addBidireccionales("SUSTANTIVO", new String[][] {
+                {"science", "ciencia"},
+                {"technology", "tecnologia"},
+                {"mathematics", "matematicas"},
+                {"math", "matematica"},
+                {"history", "historia"},
+                {"geography", "geografia"},
+                {"biology", "biologia"},
+                {"chemistry", "quimica"},
+                {"physics", "fisica"},
+                {"literature", "literatura"},
+                {"english", "ingles"},
+                {"spanish", "espanol"},
+                {"reading", "lectura"},
+                {"writing", "escritura"},
+                {"listening", "escucha"},
+                {"speaking", "habla"},
+                {"research", "investigacion"},
+                {"definition", "definicion"},
+                {"meaning", "significado"},
+                {"example", "ejemplo"},
+                {"exercise", "ejercicio"},
+                {"practice", "practica"},
+                {"topic", "tema"},
+                {"subject", "materia"},
+                {"rule", "regla"},
+                {"tense", "tiempo verbal"},
+                {"present tense", "presente"},
+                {"past tense", "pasado"},
+                {"future tense", "futuro"},
+                {"verb tense", "tiempo verbal"},
+                {"noun", "sustantivo"},
+                {"verb", "verbo"},
+                {"adjective", "adjetivo"},
+                {"adverb", "adverbio"},
+                {"pronoun", "pronombre"},
+                {"preposition", "preposicion"},
+                {"conjunction", "conjuncion"},
+                {"article", "articulo"},
+                {"synonym", "sinonimo"},
+                {"antonym", "antonimo"}
+        });
+
+        addBidireccionales("ADJETIVO_CALIFICATIVO", new String[][] {
+                {"important", "importante"},
+                {"available", "disponible"},
+                {"ready", "listo"},
+                {"free", "gratis"},
+                {"busy", "ocupado"},
+                {"possible", "posible"},
+                {"impossible", "imposible"},
+                {"easy", "facil"},
+                {"difficult", "dificil"},
+                {"correct", "correcto"},
+                {"incorrect", "incorrecto"},
+                {"complete", "completo"},
+                {"incomplete", "incompleto"},
+                {"active", "activo"},
+                {"inactive", "inactivo"},
+                {"public", "publico"},
+                {"private", "privado"},
+                {"secure", "seguro"},
+                {"insecure", "inseguro"},
+                {"local", "local"},
+                {"global", "global"},
+                {"fast", "rapido"},
+                {"slow", "lento"},
+                {"clean", "limpio"},
+                {"dirty", "sucio"},
+                {"full", "lleno"},
+                {"empty", "vacio"},
+                {"open", "abierto"},
+                {"closed", "cerrado"},
+                {"strong", "fuerte"},
+                {"weak", "debil"},
+                {"useful", "util"},
+                {"necessary", "necesario"},
+                {"professional", "profesional"},
+                {"academic", "academico"},
+                {"modern", "moderno"},
+                {"simple", "simple"},
+                {"complex", "complejo"},
+                {"automatic", "automatico"},
+                {"manual", "manual"},
+                {"digital", "digital"},
+                {"visual", "visual"},
+                {"functional", "funcional"},
+                {"responsive", "adaptable"},
+                {"stable", "estable"},
+                {"experimental", "experimental"},
+                {"native", "nativo"},
+                {"external", "externo"},
+                {"internal", "interno"},
+                {"personal", "personal"},
+                {"general", "general"},
+                {"specific", "especifico"},
+                {"main", "principal"},
+                {"secondary", "secundario"}
+        });
+
+        addBidireccionales("VERBO", new String[][] {
+                {"open", "abrir"},
+                {"close", "cerrar"},
+                {"start", "iniciar"},
+                {"stop", "detener"},
+                {"save", "guardar"},
+                {"load", "cargar"},
+                {"copy", "copiar"},
+                {"paste", "pegar"},
+                {"delete", "eliminar"},
+                {"clean", "limpiar"},
+                {"search", "buscar"},
+                {"translate", "traducir"},
+                {"analyze", "analizar"},
+                {"detect", "detectar"},
+                {"listen", "escuchar"},
+                {"speak", "hablar"},
+                {"write", "escribir"},
+                {"read", "leer"},
+                {"send", "enviar"},
+                {"receive", "recibir"},
+                {"create", "crear"},
+                {"edit", "editar"},
+                {"update", "actualizar"},
+                {"upload", "subir"},
+                {"download", "descargar"},
+                {"connect", "conectar"},
+                {"disconnect", "desconectar"},
+                {"fix", "arreglar"},
+                {"repair", "reparar"},
+                {"improve", "mejorar"},
+                {"verify", "verificar"},
+                {"test", "probar"},
+                {"build", "compilar"},
+                {"run", "ejecutar"},
+                {"deploy", "desplegar"},
+                {"show", "mostrar"},
+                {"hide", "ocultar"},
+                {"choose", "elegir"},
+                {"select", "seleccionar"},
+                {"change", "cambiar"},
+                {"switch", "intercambiar"},
+                {"move", "mover"},
+                {"return", "regresar"},
+                {"wait", "esperar"},
+                {"continue", "continuar"},
+                {"finish", "terminar"},
+                {"begin", "empezar"},
+                {"learn", "aprender"},
+                {"teach", "ensenar"},
+                {"study", "estudiar"},
+                {"work", "trabajar"},
+                {"buy", "comprar"},
+                {"sell", "vender"},
+                {"pay", "pagar"},
+                {"ask", "preguntar"},
+                {"answer", "responder"},
+                {"understand", "entender"},
+                {"remember", "recordar"},
+                {"forget", "olvidar"},
+                {"need", "necesitar"},
+                {"want", "querer"},
+                {"use", "usar"},
+                {"help", "ayudar"}
+        });
+
+        addBidireccionales("ADVERBIO_TIEMPO", new String[][] {
+                {"now", "ahora"},
+                {"today", "hoy"},
+                {"yesterday", "ayer"},
+                {"tomorrow", "manana"},
+                {"later", "despues"},
+                {"soon", "pronto"},
+                {"early", "temprano"},
+                {"late", "tarde"},
+                {"always", "siempre"},
+                {"never", "nunca"},
+                {"sometimes", "a veces"},
+                {"usually", "usualmente"},
+                {"currently", "actualmente"},
+                {"already", "ya"},
+                {"still", "todavia"}
+        });
+
+        addBidireccionales("ADVERBIO_LUGAR", new String[][] {
+                {"here", "aqui"},
+                {"there", "alli"},
+                {"inside", "adentro"},
+                {"outside", "afuera"},
+                {"above", "arriba"},
+                {"below", "abajo"},
+                {"near", "cerca"},
+                {"far", "lejos"},
+                {"left", "izquierda"},
+                {"right", "derecha"},
+                {"forward", "adelante"},
+                {"back", "atras"}
+        });
+
+        addBidireccionales("ADVERBIO_MODO", new String[][] {
+                {"well", "bien"},
+                {"badly", "mal"},
+                {"quickly", "rapidamente"},
+                {"slowly", "lentamente"},
+                {"correctly", "correctamente"},
+                {"professionally", "profesionalmente"},
+                {"automatically", "automaticamente"},
+                {"manually", "manualmente"},
+                {"locally", "localmente"},
+                {"directly", "directamente"},
+                {"carefully", "cuidadosamente"},
+                {"clearly", "claramente"},
+                {"easily", "facilmente"},
+                {"completely", "completamente"}
+        });
+
+        addBidireccionales("EXPRESION", new String[][] {
+                {"good morning", "buenos dias"},
+                {"good afternoon", "buenas tardes"},
+                {"good night", "buenas noches"},
+                {"how are you", "como estas"},
+                {"where are you from", "de donde eres"},
+                {"what is your name", "como te llamas"},
+                {"my name is", "mi nombre es"},
+                {"thank you very much", "muchas gracias"},
+                {"you are welcome", "de nada"},
+                {"see you later", "hasta luego"},
+                {"see you tomorrow", "hasta manana"},
+                {"what time is it", "que hora es"},
+                {"i do not understand", "no entiendo"},
+                {"i need help", "necesito ayuda"},
+                {"please translate", "por favor traduce"},
+                {"local translator", "traductor local"},
+                {"academic translator", "traductor academico"},
+                {"english language", "idioma ingles"},
+                {"spanish language", "idioma espanol"},
+                {"backend not available", "backend no disponible"},
+                {"connection refused", "conexion rechazada"},
+                {"network error", "error de red"},
+                {"source language", "idioma origen"},
+                {"target language", "idioma destino"},
+                {"copy translation", "copiar traduccion"},
+                {"listen pronunciation", "escuchar pronunciacion"}
+        });
+
+        add("translated", "VERBO", "tradujo");
+        add("translating", "VERBO", "traduciendo");
+        add("translates", "VERBO", "traduce");
+        add("traduzco", "VERBO", "translate");
+        add("traduces", "VERBO", "translate");
+        add("traduce", "VERBO", "translates");
+        add("traducimos", "VERBO", "translate");
+        add("traducen", "VERBO", "translate");
+        add("traducido", "VERBO", "translated");
+        add("copied", "VERBO", "copio");
+        add("copying", "VERBO", "copiando");
+        add("copies", "VERBO", "copia");
+        add("copia", "VERBO", "copies");
+        add("copiado", "VERBO", "copied");
+        add("loaded", "VERBO", "cargo");
+        add("loading", "VERBO", "cargando");
+        add("loads", "VERBO", "carga");
+        add("carga", "VERBO", "loads");
+        add("cargado", "VERBO", "loaded");
+        add("deleted", "VERBO", "elimino");
+        add("deleting", "VERBO", "eliminando");
+        add("deletes", "VERBO", "elimina");
+        add("elimina", "VERBO", "deletes");
+        add("eliminado", "VERBO", "deleted");
+        add("listened", "VERBO", "escucho");
+        add("listening", "VERBO", "escuchando");
+        add("listens", "VERBO", "escucha");
+        add("escucha", "VERBO", "listens");
+        add("escuchado", "VERBO", "listened");
+        add("spoken", "VERBO", "hablado");
+        add("speaking", "VERBO", "hablando");
+        add("speaks", "VERBO", "habla");
+        add("habla", "VERBO", "speaks");
+        add("written", "VERBO", "escrito");
+        add("writing", "VERBO", "escribiendo");
+        add("writes", "VERBO", "escribe");
+        add("escribe", "VERBO", "writes");
+        add("opened", "VERBO", "abrio");
+        add("opening", "VERBO", "abriendo");
+        add("opens", "VERBO", "abre");
+        add("abre", "VERBO", "opens");
+        add("closed", "VERBO", "cerro");
+        add("closing", "VERBO", "cerrando");
+        add("closes", "VERBO", "cierra");
+        add("cierra", "VERBO", "closes");
+        add("started", "VERBO", "inicio");
+        add("starting", "VERBO", "iniciando");
+        add("starts", "VERBO", "inicia");
+        add("inicia", "VERBO", "starts");
+        add("running", "VERBO", "ejecutando");
+        add("runs", "VERBO", "ejecuta");
+        add("ejecuta", "VERBO", "runs");
+        add("verified", "VERBO", "verifico");
+        add("verifying", "VERBO", "verificando");
+        add("verifies", "VERBO", "verifica");
+        add("verifica", "VERBO", "verifies");
+        add("improved", "VERBO", "mejoro");
+        add("improving", "VERBO", "mejorando");
+        add("improves", "VERBO", "mejora");
+        add("mejora", "VERBO", "improves");
+        add("needed", "VERBO", "necesito");
+        add("needing", "VERBO", "necesitando");
+        add("needs", "VERBO", "necesita");
+        add("necesita", "VERBO", "needs");
+    }
+
     public static String clasificar(String palabra) {
         String clave = normalizarClave(palabra);
         String[] e = mapa.get(clave);
-        return e != null ? e[0] : "DESCONOCIDO";
+        return e != null ? e[0] : inferirTipo(clave);
     }
 
     public static String traducir(String palabra) {
@@ -1866,18 +2436,101 @@ public class Diccionario {
 
     public static String traducirSegunIdioma(String palabra, String idiomaOrigen) {
         String clave = normalizarClave(palabra);
-        if ("es".equals(idiomaOrigen)) {
-            String forzada = traduccionesForzadasES_EN.get(clave);
-            if (forzada != null) {
-                return forzada;
-            }
-        } else if ("en".equals(idiomaOrigen)) {
-            String forzada = traduccionesForzadasEN_ES.get(clave);
-            if (forzada != null) {
-                return forzada;
-            }
+        String forzada = obtenerTraduccionForzada(clave, idiomaOrigen);
+        if (forzada != null) {
+            return forzada;
         }
         return traducir(clave);
+    }
+
+    public static Entrada consultar(String palabra, String idiomaOrigen) {
+        String original = palabra == null ? "" : palabra.trim();
+        String clave = normalizarClave(limpiarPalabra(original));
+        String[] entrada = mapa.get(clave);
+        String forzada = obtenerTraduccionForzada(clave, idiomaOrigen);
+        boolean tieneForzada = forzada != null;
+        boolean conocida = entrada != null || tieneForzada;
+        String tipo = entrada != null ? entrada[0] : inferirTipo(clave);
+        String traduccion;
+
+        if (tieneForzada) {
+            traduccion = forzada;
+        } else if (entrada != null) {
+            traduccion = limpiarAlternativas(entrada[1]);
+        } else {
+            String derivada = traducirFormaDerivada(clave, idiomaOrigen);
+            traduccion = derivada != null ? derivada : original;
+        }
+
+        return new Entrada(
+                original,
+                clave,
+                tipo,
+                categoria(tipo),
+                traduccion,
+                conocida,
+                entrada != null ? "DICCIONARIO" : (tieneForzada ? "FORZADA" : "INFERIDA"));
+    }
+
+    public static List<Entrada> consultarTexto(String texto, String idiomaOrigen) {
+        List<Entrada> entradas = new ArrayList<>();
+        if (texto == null || texto.isBlank()) {
+            return entradas;
+        }
+
+        Matcher matcher = TOKEN_TEXTO.matcher(normalizarExpresiones(texto));
+        while (matcher.find()) {
+            String token = matcher.group();
+            if (token.matches("\\p{L}+(?:['’]\\p{L}+)?|\\d+")) {
+                entradas.add(consultar(token, idiomaOrigen));
+            }
+        }
+        return entradas;
+    }
+
+    public static String traducirTexto(String texto, String idiomaOrigen) {
+        if (texto == null || texto.isBlank()) {
+            return "";
+        }
+
+        StringBuilder resultado = new StringBuilder();
+        Matcher matcher = TOKEN_TEXTO.matcher(normalizarExpresiones(texto));
+
+        while (matcher.find()) {
+            String token = matcher.group();
+            String salida = token;
+            if (token.matches("\\p{L}+(?:['’]\\p{L}+)?|\\d+")) {
+                Entrada entrada = consultar(token, idiomaOrigen);
+                salida = entrada.getTraduccion();
+            }
+
+            if (resultado.length() == 0) {
+                resultado.append(capitalizarSiAplica(salida, token));
+            } else if (esPuntuacionAdherida(salida)) {
+                resultado.append(salida);
+            } else {
+                resultado.append(" ").append(salida);
+            }
+        }
+
+        return resultado.toString().trim();
+    }
+
+    public static String categoria(String tipo) {
+        if (tipo == null || tipo.isBlank()) return "OTRO";
+        if (tipo.startsWith("PRONOMBRE")) return "PRONOMBRE";
+        if (tipo.startsWith("VERBO")) return "VERBO";
+        if (tipo.startsWith("SUSTANTIVO")) return "SUSTANTIVO";
+        if (tipo.startsWith("ADJETIVO")) return "ADJETIVO";
+        if (tipo.startsWith("ADVERBIO")) return "ADVERBIO";
+        if (tipo.startsWith("ARTICULO")) return "ARTICULO";
+        if (tipo.startsWith("CONJUNCION")) return "CONJUNCION";
+        if (tipo.startsWith("PREPOSICION")) return "PREPOSICION";
+        if (tipo.startsWith("NUMERAL")) return "NUMERAL";
+        if (tipo.equals("POSESIVO") || tipo.equals("DEMOSTRATIVO")) return "DETERMINANTE";
+        if (tipo.equals("CONTRACCION")) return "CONTRACCION";
+        if (tipo.equals("INTERJECCION")) return "INTERJECCION";
+        return "OTRO";
     }
 
     public static String normalizarExpresiones(String texto) {
@@ -1919,8 +2572,159 @@ public class Diccionario {
         return es > en ? "es" : "en";
     }
 
+    private static String obtenerTraduccionForzada(String clave, String idiomaOrigen) {
+        if ("es".equals(idiomaOrigen)) {
+            return traduccionesForzadasES_EN.get(clave);
+        }
+        if ("en".equals(idiomaOrigen)) {
+            return traduccionesForzadasEN_ES.get(clave);
+        }
+        return null;
+    }
+
+    private static String limpiarPalabra(String palabra) {
+        if (palabra == null) {
+            return "";
+        }
+        return palabra
+                .replaceAll("^[^\\p{L}\\d]+", "")
+                .replaceAll("[^\\p{L}\\d]+$", "")
+                .toLowerCase();
+    }
+
+    private static String limpiarAlternativas(String traduccion) {
+        if (traduccion == null) {
+            return "";
+        }
+        return traduccion.contains("/") ? traduccion.split("/")[0] : traduccion;
+    }
+
+    private static String inferirTipo(String clave) {
+        if (clave == null || clave.isBlank()) {
+            return "DESCONOCIDO";
+        }
+        if (clave.matches("\\d+")) {
+            return "NUMERAL_CARDINAL";
+        }
+        if (clave.matches(".*(ing|ed|en)$")) {
+            return "VERBO";
+        }
+        if (clave.matches(".*ly$")) {
+            return "ADVERBIO_MODO";
+        }
+        if (clave.matches(".*(able|ible|ous|ful|less|ive|al|ic|ish)$")) {
+            return "ADJETIVO_CALIFICATIVO";
+        }
+        return "SUSTANTIVO";
+    }
+
+    private static String traducirFormaDerivada(String clave, String idiomaOrigen) {
+        if (!"en".equals(idiomaOrigen) || clave == null || clave.isBlank()) {
+            return null;
+        }
+
+        if (clave.endsWith("ing") && clave.length() > 4) {
+            String base = resolverBaseIngles(clave.substring(0, clave.length() - 3));
+            String[] entradaBase = mapa.get(base);
+            if (entradaBase != null && entradaBase[0].startsWith("VERBO")) {
+                return gerundioEspanol(limpiarAlternativas(entradaBase[1]));
+            }
+        }
+
+        if (clave.endsWith("ed") && clave.length() > 3) {
+            String base = resolverBaseIngles(clave.substring(0, clave.length() - 2));
+            String[] entradaBase = mapa.get(base);
+            if (entradaBase != null && entradaBase[0].startsWith("VERBO")) {
+                return pasadoSimpleEspanol(limpiarAlternativas(entradaBase[1]));
+            }
+        }
+
+        if (clave.endsWith("s") && clave.length() > 2) {
+            String singular = clave.substring(0, clave.length() - 1);
+            String[] entradaSingular = mapa.get(singular);
+            if (entradaSingular != null && entradaSingular[0].startsWith("SUSTANTIVO")) {
+                return pluralEspanol(limpiarAlternativas(entradaSingular[1]));
+            }
+        }
+
+        return null;
+    }
+
+    private static String resolverBaseIngles(String base) {
+        if (mapa.containsKey(base)) {
+            return base;
+        }
+        if (base.endsWith("i")) {
+            String conY = base.substring(0, base.length() - 1) + "y";
+            if (mapa.containsKey(conY)) {
+                return conY;
+            }
+        }
+        if (base.length() > 2) {
+            String sinDobleConsonante = base.substring(0, base.length() - 1);
+            if (mapa.containsKey(sinDobleConsonante)) {
+                return sinDobleConsonante;
+            }
+        }
+        if (mapa.containsKey(base + "e")) {
+            return base + "e";
+        }
+        return base;
+    }
+
+    private static String gerundioEspanol(String infinitivo) {
+        if (infinitivo == null || infinitivo.isBlank()) {
+            return infinitivo;
+        }
+        if (infinitivo.endsWith("ar")) {
+            return infinitivo.substring(0, infinitivo.length() - 2) + "ando";
+        }
+        if (infinitivo.endsWith("er") || infinitivo.endsWith("ir")) {
+            return infinitivo.substring(0, infinitivo.length() - 2) + "iendo";
+        }
+        return infinitivo;
+    }
+
+    private static String pasadoSimpleEspanol(String infinitivo) {
+        if (infinitivo == null || infinitivo.isBlank()) {
+            return infinitivo;
+        }
+        if (infinitivo.endsWith("ar")) {
+            return infinitivo.substring(0, infinitivo.length() - 2) + "o";
+        }
+        if (infinitivo.endsWith("er") || infinitivo.endsWith("ir")) {
+            return infinitivo.substring(0, infinitivo.length() - 2) + "io";
+        }
+        return infinitivo;
+    }
+
+    private static String pluralEspanol(String singular) {
+        if (singular == null || singular.isBlank()) {
+            return singular;
+        }
+        char ultima = singular.charAt(singular.length() - 1);
+        if ("aeiou".indexOf(Character.toLowerCase(ultima)) >= 0) {
+            return singular + "s";
+        }
+        return singular + "es";
+    }
+
+    private static boolean esPuntuacionAdherida(String token) {
+        return token.matches("[.,;:!?)]");
+    }
+
+    private static String capitalizarSiAplica(String salida, String tokenOriginal) {
+        if (salida == null || salida.isBlank() || tokenOriginal == null || tokenOriginal.isBlank()) {
+            return salida;
+        }
+        if (Character.isUpperCase(tokenOriginal.charAt(0))) {
+            return Character.toUpperCase(salida.charAt(0)) + salida.substring(1);
+        }
+        return salida;
+    }
+
     private static String normalizarClave(String palabra) {
-        String clave = palabra.toLowerCase();
+        String clave = palabra == null ? "" : palabra.trim().toLowerCase();
         String original = expresionCompactaAOriginal.get(clave);
         return original != null ? original : clave;
     }

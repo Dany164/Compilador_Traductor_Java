@@ -1,19 +1,23 @@
 import Translator from "./components/Translator";
+import logoTitulo from "../img/LogoCompiTrad.png";
 import "./App.css";
 
 function App() {
   return (
     <div className="app">
       <header className="app-header">
-        <h1>🧠 CompilaTrad</h1>
-        <p>Compilador Traductor Inglés ↔ Español</p>
+        <div className="brand-banner">
+          <h1 className="sr-only">CompiTrad DMN</h1>
+          <div className="brand-content">
+            <img className="brand-logo" src={logoTitulo} alt="CompiTrad DMN" />
+            <p className="eyebrow">Traductor académico inglés - español</p>
+          </div>
+        </div>
       </header>
+
       <main>
         <Translator />
       </main>
-      <footer>
-        <p>Universidad Mariano Gálvez - Compiladores 2026</p>
-      </footer>
     </div>
   );
 }

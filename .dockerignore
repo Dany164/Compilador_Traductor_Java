@@ -1,0 +1,9 @@
+.git
+.idea
+target
+traductor_frontend/traductor-frontend/node_modules
+traductor_frontend/traductor-frontend/dist
+*.log
+.env
+.env.*
+
