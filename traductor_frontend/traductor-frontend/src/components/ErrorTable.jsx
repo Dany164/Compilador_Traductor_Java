@@ -10,7 +10,7 @@ function ErrorTable({ errores }) {
   return (
     <div className="table-container">
       <h3>❌ Tabla de Errores</h3>
-      <table>
+      <table className="data-table errors-table">
         <thead>
           <tr>
             <th>#</th>
@@ -25,19 +25,16 @@ function ErrorTable({ errores }) {
             <tr key={`${error.tipo}-${error.linea}-${error.columna}-${i}`}>
               <td>{i + 1}</td>
               <td>
-                <span style={{
-                  background:   colorTipo[error.tipo] || "#555",
-                  color:        "white",
-                  padding:      "2px 8px",
-                  borderRadius: "4px",
-                  fontSize:     "0.8rem"
-                }}>
+                <span
+                  className="symbol-badge"
+                  style={{ backgroundColor: colorTipo[error.tipo] || "#555" }}
+                >
                   {error.tipo}
                 </span>
               </td>
               <td>{error.linea}</td>
               <td>{error.columna}</td>
-              <td>{error.descripcion}</td>
+              <td className="description-cell">{error.descripcion}</td>
             </tr>
           ))}
         </tbody>

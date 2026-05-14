@@ -4,7 +4,7 @@ function TokensTable({ tokens }) {
   return (
     <div className="table-container">
       <h3>📋 Tabla de Tokens</h3>
-      <table>
+      <table className="data-table tokens-table">
         <thead>
           <tr>
             <th>#</th>
@@ -19,13 +19,13 @@ function TokensTable({ tokens }) {
           {tokens.map((token, i) => (
             <tr key={`${token.valor}-${token.linea}-${token.columna}-${i}`}>
               <td>{i + 1}</td>
-              <td><strong>{token.valor}</strong></td>
+              <td className="word-cell"><strong>{token.valor}</strong></td>
               <td>
                 <span className={`badge badge-${token.tipo.toLowerCase()}`}>
                   {token.tipo}
                 </span>
               </td>
-              <td>{token.traduccion}</td>
+              <td className="word-cell">{token.traduccion}</td>
               <td>{token.linea}</td>
               <td>{token.columna}</td>
             </tr>

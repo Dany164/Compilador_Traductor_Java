@@ -404,7 +404,7 @@ function Translator() {
           <input
             type="checkbox"
             checked={usarIA}
-            onChange={(e) => dispatch({ type: "TOGGLE_USAR_IA" })}
+            onChange={() => dispatch({ type: "TOGGLE_USAR_IA" })}
             style={{ cursor: "pointer", width: "18px", height: "18px" }}
           />
           🤖 Usar IA

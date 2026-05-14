@@ -10,7 +10,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 
-@SuppressWarnings("fallthrough")
 public class Lexer implements java_cup.runtime.Scanner {
 
   /** This character denotes the end of file. */
@@ -954,7 +953,6 @@ public class Lexer implements java_cup.runtime.Scanner {
           case 17: break;
           case 9:
             { String palabra = yytext().toLowerCase();
-                 String tipo    = Diccionario.clasificar(palabra);
                  String trad    = Diccionario.traducir(palabra);
                  Token t = new Token(yytext(), "CONTRACCION", trad,
                                      yyline + 1, yycolumn + 1);

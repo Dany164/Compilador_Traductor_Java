@@ -273,7 +273,7 @@ function Translator() {
         if (activo) {
           dispatch({ type: "AUTO_SUCCESS", payload: resultado });
         }
-      } catch (error) {
+      } catch {
         if (activo) {
           dispatch({
             type: "AUTO_ERROR",
@@ -295,7 +295,7 @@ function Translator() {
     try {
       const resultado = await analizarTexto(textoEntrada, usarIA);
       dispatch({ type: "ANALIZAR_SUCCESS", payload: resultado });
-    } catch (error) {
+    } catch {
       dispatch({
         type: "ANALIZAR_ERROR",
         payload: {
@@ -347,7 +347,7 @@ function Translator() {
     try {
       await navigator.clipboard.writeText(contenido);
       dispatch({ type: "SET_MENSAJE_ESTADO", payload: "Traduccion copiada." });
-    } catch (error) {
+    } catch {
       dispatch({ type: "SET_MENSAJE_ESTADO", payload: "No se pudo copiar la traduccion." });
     }
   };
@@ -433,7 +433,7 @@ function Translator() {
 
     try {
       recognition.start();
-    } catch (error) {
+    } catch {
       dispatch({ type: "SET_ESCUCHANDO", payload: false });
       dispatch({ type: "SET_MENSAJE_VOZ", payload: "El microfono ya esta iniciando." });
     }

@@ -1,0 +1,11 @@
+{
+  "java.configuration.updateBuildConfiguration": "automatic",
+  "java.configuration.runtimes": [
+    {
+      "name": "JavaSE-17",
+      "path": "C:\\Program Files\\JetBrains\\IntelliJ IDEA 2025.1\\jbr",
+      "default": true
+    }
+  ],
+  "java.jdt.ls.java.home": "C:\\Program Files\\JetBrains\\IntelliJ IDEA 2025.1\\jbr"
+}

@@ -13,9 +13,11 @@ public class NodoAST {
         this.tipo  = tipo;
         this.hijos = new ArrayList<>();
         for (Object e : elementos) {
-            if (e instanceof NodoAST nodo) {
+            if (e instanceof NodoAST) {
+                NodoAST nodo = (NodoAST) e;
                 hijos.add(nodo);
-            } else if (e instanceof String s) {
+            } else if (e instanceof String) {
+                String s = (String) e;
                 if (s != null && !s.isEmpty()) {
                     hijos.add(new NodoAST("HOJA", s));
                 }

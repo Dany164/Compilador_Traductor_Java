@@ -2415,6 +2415,905 @@ public class Diccionario {
         add("needing", "VERBO", "necesitando");
         add("needs", "VERBO", "necesita");
         add("necesita", "VERBO", "needs");
+
+        cargarVocabularioGramaticalProfesional();
+        cargarVocabularioCienciasYProfesiones();
+        cargarVocabularioTecnologiaComputacion();
+        cargarVocabularioCotidianoYRelaciones();
+        cargarExpresionesIdiomaticasYContextuales();
+        cargarVariacionesFrecuentes();
+        cargarVocabularioServiciosEmergenciasYGobierno();
+        cargarVocabularioComercioLogisticaYAtencion();
+        cargarVocabularioDatosNubeDevOpsEIA();
+        cargarVocabularioSaludCuerpoYEmociones();
+        cargarVocabularioEducacionInvestigacionYEscritura();
+    }
+
+    private static void cargarVocabularioGramaticalProfesional() {
+        addBidireccionales("SUSTANTIVO", new String[][] {
+                {"proper noun", "sustantivo propio"},
+                {"common noun", "sustantivo comun"},
+                {"auxiliary verb", "verbo auxiliar"},
+                {"modal verb", "verbo modal"},
+                {"phrasal verb", "verbo compuesto"},
+                {"regular verb", "verbo regular"},
+                {"irregular verb", "verbo irregular"},
+                {"possessive pronoun", "pronombre posesivo"},
+                {"demonstrative pronoun", "pronombre demostrativo"},
+                {"reflexive pronoun", "pronombre reflexivo"},
+                {"interrogative pronoun", "pronombre interrogativo"},
+                {"definite article", "articulo definido"},
+                {"indefinite article", "articulo indefinido"},
+                {"determiner", "determinante"},
+                {"quantifier", "cuantificador"},
+                {"logical connector", "conector logico"},
+                {"grammar connector", "conector gramatical"},
+                {"idiom", "modismo"},
+                {"formal phrase", "frase formal"},
+                {"informal phrase", "frase informal"},
+                {"courtesy expression", "expresion de cortesia"},
+                {"affirmative sentence", "oracion afirmativa"},
+                {"negative sentence", "oracion negativa"},
+                {"interrogative sentence", "oracion interrogativa"},
+                {"active voice", "voz activa"},
+                {"passive voice", "voz pasiva"},
+                {"conditional sentence", "oracion condicional"},
+                {"comparative", "comparativo"},
+                {"superlative", "superlativo"},
+                {"singular", "singular"},
+                {"plural", "plural"},
+                {"masculine gender", "genero masculino"},
+                {"feminine gender", "genero femenino"},
+                {"agreement", "concordancia"},
+                {"spelling rule", "regla ortografica"},
+                {"punctuation rule", "regla de puntuacion"},
+                {"capital letter", "mayuscula"},
+                {"lowercase letter", "minuscula"},
+                {"contraction", "contraccion"},
+                {"abbreviation", "abreviatura"},
+                {"prefix", "prefijo"},
+                {"suffix", "sufijo"},
+                {"homonym", "homonimo"},
+                {"compound word", "palabra compuesta"},
+                {"contextual translation", "traduccion contextual"},
+                {"grammar correction", "correccion gramatical"},
+                {"spelling correction", "correccion ortografica"},
+                {"semantic validation", "validacion semantica"},
+                {"context interpretation", "interpretacion contextual"}
+        });
+
+        addBidireccionales("PRONOMBRE_PERSONAL", new String[][] {
+                {"myself", "yo mismo"},
+                {"yourself", "tu mismo"},
+                {"himself", "el mismo"},
+                {"herself", "ella misma"},
+                {"itself", "si mismo"},
+                {"ourselves", "nosotros mismos"},
+                {"yourselves", "ustedes mismos"},
+                {"themselves", "ellos mismos"}
+        });
+
+        addBidireccionales("ADVERBIO_NEGACION", new String[][] {
+                {"not", "no"},
+                {"no longer", "ya no"},
+                {"neither", "tampoco"},
+                {"nor", "ni"}
+        });
+
+        addBidireccionales("ADVERBIO_CANTIDAD", new String[][] {
+                {"much", "mucho"},
+                {"many", "muchos"},
+                {"few", "pocos"},
+                {"little", "poco"},
+                {"enough", "suficiente"},
+                {"too much", "demasiado"},
+                {"almost", "casi"},
+                {"approximately", "aproximadamente"},
+                {"exactly", "exactamente"}
+        });
+
+        addBidireccionales("CONJUNCION_CONSECUTIVA", new String[][] {
+                {"therefore", "por lo tanto"},
+                {"so", "asi que"},
+                {"thus", "por consiguiente"},
+                {"consequently", "en consecuencia"}
+        });
+
+        addBidireccionales("CONJUNCION_CONDICIONAL", new String[][] {
+                {"if", "si"},
+                {"unless", "a menos que"},
+                {"provided that", "siempre que"},
+                {"as long as", "siempre y cuando"}
+        });
+
+        addBidireccionales("CONJUNCION_ADVERSATIVA", new String[][] {
+                {"however", "sin embargo"},
+                {"nevertheless", "no obstante"},
+                {"although", "aunque"},
+                {"even though", "aunque"}
+        });
+    }
+
+    private static void cargarVocabularioCienciasYProfesiones() {
+        addBidireccionales("SUSTANTIVO", new String[][] {
+                {"nursing", "enfermeria"},
+                {"psychology", "psicologia"},
+                {"law", "derecho"},
+                {"economics", "economia"},
+                {"finance", "finanzas"},
+                {"accounting", "contabilidad"},
+                {"administration", "administracion"},
+                {"marketing", "mercadeo"},
+                {"business", "negocios"},
+                {"human resources", "recursos humanos"},
+                {"engineering", "ingenieria"},
+                {"architecture", "arquitectura"},
+                {"construction", "construccion"},
+                {"electronics", "electronica"},
+                {"electricity", "electricidad"},
+                {"mechanics", "mecanica"},
+                {"automotive", "automotriz"},
+                {"aviation", "aviacion"},
+                {"gastronomy", "gastronomia"},
+                {"agriculture", "agricultura"},
+                {"veterinary medicine", "veterinaria"},
+                {"sports", "deportes"},
+                {"gym", "gimnasio"},
+                {"soccer", "futbol"},
+                {"video game", "videojuego"},
+                {"music", "musica"},
+                {"movie", "pelicula"},
+                {"series", "serie"},
+                {"art", "arte"},
+                {"politics", "politica"},
+                {"religion", "religion"},
+                {"social media", "redes sociales"},
+                {"communication", "comunicacion"},
+                {"news", "noticias"},
+                {"travel", "viaje"},
+                {"tourism", "turismo"},
+                {"transportation", "transporte"},
+                {"shopping", "compras"},
+                {"fashion", "moda"},
+                {"beauty", "belleza"},
+                {"health", "salud"},
+                {"emotion", "emocion"},
+                {"relationship", "relacion"},
+                {"office", "oficina"},
+                {"customer service", "atencion al cliente"},
+                {"contract", "contrato"},
+                {"budget", "presupuesto"},
+                {"profit", "ganancia"},
+                {"loss", "perdida"},
+                {"tax", "impuesto"},
+                {"investment", "inversion"},
+                {"loan", "prestamo"},
+                {"salary", "salario"},
+                {"resume", "curriculum"},
+                {"interview", "entrevista"},
+                {"manager", "gerente"},
+                {"employee", "empleado"},
+                {"team", "equipo"},
+                {"goal", "meta"},
+                {"strategy", "estrategia"},
+                {"campaign", "campana"},
+                {"patient", "paciente"},
+                {"nurse", "enfermero"},
+                {"treatment", "tratamiento"},
+                {"diagnosis", "diagnostico"},
+                {"symptom", "sintoma"},
+                {"therapy", "terapia"},
+                {"anxiety", "ansiedad"},
+                {"stress", "estres"},
+                {"evidence", "evidencia"},
+                {"judge", "juez"},
+                {"lawyer", "abogado"},
+                {"court", "tribunal"},
+                {"case", "caso"},
+                {"rights", "derechos"},
+                {"responsibility", "responsabilidad"},
+                {"formula", "formula"},
+                {"equation", "ecuacion"},
+                {"variable", "variable"},
+                {"constant", "constante"},
+                {"cell", "celula"},
+                {"molecule", "molecula"},
+                {"atom", "atomo"},
+                {"energy", "energia"},
+                {"force", "fuerza"},
+                {"mass", "masa"},
+                {"speed", "velocidad"},
+                {"temperature", "temperatura"}
+        });
+
+        addBidireccionales("ADJETIVO_CALIFICATIVO", new String[][] {
+                {"financial", "financiero"},
+                {"legal", "legal"},
+                {"medical", "medico"},
+                {"academic", "academico"},
+                {"scientific", "cientifico"},
+                {"professional", "profesional"},
+                {"technical", "tecnico"},
+                {"commercial", "comercial"},
+                {"administrative", "administrativo"},
+                {"human", "humano"},
+                {"economic", "economico"},
+                {"political", "politico"},
+                {"cultural", "cultural"},
+                {"historical", "historico"},
+                {"geographical", "geografico"}
+        });
+    }
+
+    private static void cargarVocabularioTecnologiaComputacion() {
+        addBidireccionales("SUSTANTIVO", new String[][] {
+                {"cybersecurity", "seguridad informatica"},
+                {"computer security", "seguridad informatica"},
+                {"networking", "redes"},
+                {"router", "enrutador"},
+                {"switch device", "conmutador"},
+                {"firewall", "cortafuegos"},
+                {"encryption", "cifrado"},
+                {"authentication", "autenticacion"},
+                {"authorization", "autorizacion"},
+                {"session", "sesion"},
+                {"cookie", "cookie"},
+                {"cache", "cache"},
+                {"endpoint", "endpoint"},
+                {"api", "api"},
+                {"framework", "framework"},
+                {"library", "libreria"},
+                {"package", "paquete"},
+                {"module", "modulo"},
+                {"component", "componente"},
+                {"function", "funcion"},
+                {"method", "metodo"},
+                {"object", "objeto"},
+                {"property", "propiedad"},
+                {"attribute", "atributo"},
+                {"parameter", "parametro"},
+                {"argument", "argumento"},
+                {"array", "arreglo"},
+                {"list", "lista"},
+                {"queue", "cola"},
+                {"stack", "pila"},
+                {"tree", "arbol"},
+                {"syntax tree", "arbol sintactico"},
+                {"abstract syntax tree", "arbol sintactico abstracto"},
+                {"token list", "lista de tokens"},
+                {"lexer", "analizador lexico"},
+                {"parser", "analizador sintactico"},
+                {"semantic analyzer", "analizador semantico"},
+                {"compiler", "compilador"},
+                {"interpreter", "interprete"},
+                {"algorithm", "algoritmo"},
+                {"data structure", "estructura de datos"},
+                {"variable declaration", "declaracion de variable"},
+                {"assignment", "asignacion"},
+                {"loop", "ciclo"},
+                {"condition", "condicion"},
+                {"exception", "excepcion"},
+                {"bug", "error"},
+                {"feature", "funcionalidad"},
+                {"repository", "repositorio"},
+                {"branch", "rama"},
+                {"commit", "commit"},
+                {"pull request", "solicitud de cambios"},
+                {"merge", "fusion"},
+                {"deployment pipeline", "pipeline de despliegue"},
+                {"build process", "proceso de compilacion"},
+                {"frontend application", "aplicacion frontend"},
+                {"backend service", "servicio backend"},
+                {"mobile development", "desarrollo movil"},
+                {"web development", "desarrollo web"},
+                {"html", "html"},
+                {"css", "css"},
+                {"javascript", "javascript"},
+                {"java", "java"},
+                {"python", "python"},
+                {"php", "php"},
+                {"sql", "sql"},
+                {"linux", "linux"},
+                {"windows", "windows"},
+                {"android", "android"},
+                {"github", "github"},
+                {"git", "git"},
+                {"render", "render"},
+                {"vercel", "vercel"},
+                {"cloud", "nube"}
+        });
+
+        addBidireccionales("VERBO", new String[][] {
+                {"compile", "compilar"},
+                {"execute", "ejecutar"},
+                {"debug", "depurar"},
+                {"install", "instalar"},
+                {"configure", "configurar"},
+                {"authenticate", "autenticar"},
+                {"authorize", "autorizar"},
+                {"encrypt", "cifrar"},
+                {"decrypt", "descifrar"},
+                {"validate", "validar"},
+                {"parse", "analizar sintacticamente"},
+                {"tokenize", "tokenizar"},
+                {"render", "renderizar"},
+                {"refresh", "actualizar"},
+                {"redirect", "redirigir"},
+                {"request", "solicitar"},
+                {"respond", "responder"},
+                {"commit", "confirmar"},
+                {"merge", "fusionar"},
+                {"clone", "clonar"},
+                {"push", "subir"},
+                {"pull", "descargar cambios"}
+        });
+    }
+
+    private static void cargarVocabularioCotidianoYRelaciones() {
+        addBidireccionales("SUSTANTIVO", new String[][] {
+                {"friendship", "amistad"},
+                {"partner", "pareja"},
+                {"boyfriend", "novio"},
+                {"girlfriend", "novia"},
+                {"husband", "esposo"},
+                {"wife", "esposa"},
+                {"marriage", "matrimonio"},
+                {"wedding", "boda"},
+                {"date", "cita"},
+                {"hug", "abrazo"},
+                {"kiss", "beso"},
+                {"romance", "romance"},
+                {"affection", "afecto"},
+                {"trust", "confianza"},
+                {"respect", "respeto"},
+                {"support", "apoyo"},
+                {"feeling", "sentimiento"},
+                {"happiness", "felicidad"},
+                {"sadness", "tristeza"},
+                {"hope", "esperanza"},
+                {"dream", "sueno"},
+                {"life", "vida"},
+                {"memory", "recuerdo"},
+                {"smile", "sonrisa"},
+                {"conversation", "conversacion"},
+                {"message", "mensaje"},
+                {"call", "llamada"},
+                {"family member", "familiar"},
+                {"neighbor", "vecino"},
+                {"community", "comunidad"},
+                {"apartment", "apartamento"},
+                {"garden", "jardin"},
+                {"garage", "garaje"},
+                {"restaurant", "restaurante"},
+                {"menu", "menu"},
+                {"recipe", "receta"},
+                {"ingredient", "ingrediente"},
+                {"break", "descanso"},
+                {"vacation", "vacaciones"},
+                {"beach", "playa"},
+                {"mountain", "montana"},
+                {"river", "rio"},
+                {"station", "estacion"},
+                {"train", "tren"},
+                {"subway", "metro"},
+                {"taxi", "taxi"},
+                {"flight", "vuelo"},
+                {"passport", "pasaporte"},
+                {"suitcase", "maleta"}
+        });
+
+        add("amor", "SUSTANTIVO", "love");
+        add("amores", "SUSTANTIVO", "loves");
+        add("cariño", "SUSTANTIVO", "darling");
+        add("carino", "SUSTANTIVO", "darling");
+        add("querido", "ADJETIVO_CALIFICATIVO", "dear");
+        add("querida", "ADJETIVO_CALIFICATIVO", "dear");
+        add("enamorado", "ADJETIVO_CALIFICATIVO", "in love");
+        add("enamorada", "ADJETIVO_CALIFICATIVO", "in love");
+        add("romantico", "ADJETIVO_CALIFICATIVO", "romantic");
+        add("romantica", "ADJETIVO_CALIFICATIVO", "romantic");
+        add("tierno", "ADJETIVO_CALIFICATIVO", "tender");
+        add("tierna", "ADJETIVO_CALIFICATIVO", "tender");
+        add("fiel", "ADJETIVO_CALIFICATIVO", "faithful");
+        add("beloved", "ADJETIVO_CALIFICATIVO", "amado");
+        add("romantic", "ADJETIVO_CALIFICATIVO", "romantico");
+        add("tender", "ADJETIVO_CALIFICATIVO", "tierno");
+        add("faithful", "ADJETIVO_CALIFICATIVO", "fiel");
+
+        addBidireccionales("VERBO", new String[][] {
+                {"like", "gustar"},
+                {"care", "cuidar"},
+                {"trust", "confiar"},
+                {"respect", "respetar"},
+                {"support", "apoyar"},
+                {"miss", "extrañar"},
+                {"hug", "abrazar"},
+                {"kiss", "besar"},
+                {"smile", "sonreir"},
+                {"feel", "sentir"},
+                {"forgive", "perdonar"},
+                {"promise", "prometer"},
+                {"celebrate", "celebrar"},
+                {"invite", "invitar"},
+                {"visit", "visitar"}
+        });
+
+        add("loved", "VERBO", "amo");
+        add("loving", "VERBO", "amando");
+        add("liked", "VERBO", "gusto");
+        add("liking", "VERBO", "gustando");
+        add("missed", "VERBO", "extrano");
+        add("missing", "VERBO", "extranando");
+        add("hugged", "VERBO", "abrazo");
+        add("hugging", "VERBO", "abrazando");
+        add("kissed", "VERBO", "beso");
+        add("kissing", "VERBO", "besando");
+    }
+
+    private static void cargarExpresionesIdiomaticasYContextuales() {
+        addBidireccionales("EXPRESION", new String[][] {
+                {"hello love", "hola amor"},
+                {"hi love", "hola amor"},
+                {"my love", "mi amor"},
+                {"dear friend", "querido amigo"},
+                {"dear customer", "estimado cliente"},
+                {"best regards", "saludos cordiales"},
+                {"kind regards", "atentamente"},
+                {"to whom it may concern", "a quien corresponda"},
+                {"i would like", "me gustaria"},
+                {"could you please", "podrias por favor"},
+                {"thank you for your help", "gracias por tu ayuda"},
+                {"sorry for the inconvenience", "disculpa las molestias"},
+                {"as soon as possible", "lo antes posible"},
+                {"in other words", "en otras palabras"},
+                {"on the other hand", "por otro lado"},
+                {"in addition", "ademas"},
+                {"for example", "por ejemplo"},
+                {"in conclusion", "en conclusion"},
+                {"according to", "de acuerdo con"},
+                {"due to", "debido a"},
+                {"because of", "a causa de"},
+                {"in order to", "con el fin de"},
+                {"instead of", "en lugar de"},
+                {"right now", "ahora mismo"},
+                {"last week", "la semana pasada"},
+                {"next week", "la proxima semana"},
+                {"last year", "el ano pasado"},
+                {"next year", "el proximo ano"},
+                {"log in", "iniciar sesion"},
+                {"sign in", "iniciar sesion"},
+                {"sign up", "registrarse"},
+                {"log out", "cerrar sesion"},
+                {"turn on", "encender"},
+                {"turn off", "apagar"},
+                {"set up", "configurar"},
+                {"look up", "buscar"},
+                {"fill out", "llenar"},
+                {"find out", "averiguar"},
+                {"carry out", "llevar a cabo"},
+                {"break down", "descomponer"},
+                {"back up", "respaldar"},
+                {"speed up", "acelerar"},
+                {"slow down", "reducir velocidad"},
+                {"try again", "intentar de nuevo"},
+                {"make sure", "asegurarse"},
+                {"keep going", "continuar"},
+                {"let me know", "avisame"},
+                {"i love you", "te amo"},
+                {"i miss you", "te extraño"},
+                {"i like you", "me gustas"},
+                {"you are my love", "eres mi amor"},
+                {"good luck", "buena suerte"},
+                {"take care", "cuidate"},
+                {"have a nice day", "que tengas buen dia"}
+        });
+        add("hola amor", "EXPRESION", "hello love");
+        add("hello love", "EXPRESION", "hola amor");
+
+        addBidireccionales("ABREVIATURA", new String[][] {
+                {"mr", "senor"},
+                {"mrs", "senora"},
+                {"ms", "senorita"},
+                {"dr", "doctor"},
+                {"prof", "profesor"},
+                {"etc", "etcetera"},
+                {"id", "identificador"},
+                {"url", "direccion web"},
+                {"ui", "interfaz de usuario"},
+                {"ux", "experiencia de usuario"},
+                {"db", "base de datos"},
+                {"os", "sistema operativo"},
+                {"cpu", "procesador"},
+                {"ram", "memoria ram"},
+                {"ip", "direccion ip"}
+        });
+    }
+
+    private static void cargarVariacionesFrecuentes() {
+        add("people", "SUSTANTIVO", "personas");
+        add("men", "SUSTANTIVO", "hombres");
+        add("women", "SUSTANTIVO", "mujeres");
+        add("feet", "SUSTANTIVO", "pies");
+        add("teeth", "SUSTANTIVO", "dientes");
+        add("data", "SUSTANTIVO", "datos");
+        add("criteria", "SUSTANTIVO", "criterios");
+        add("analyses", "SUSTANTIVO", "analisis");
+
+        add("better", "ADJETIVO_CALIFICATIVO", "mejor");
+        add("best", "ADJETIVO_CALIFICATIVO", "mejor");
+        add("worse", "ADJETIVO_CALIFICATIVO", "peor");
+        add("worst", "ADJETIVO_CALIFICATIVO", "peor");
+        add("more", "ADVERBIO_CANTIDAD", "mas");
+        add("most", "ADVERBIO_CANTIDAD", "mas");
+        add("less", "ADVERBIO_CANTIDAD", "menos");
+        add("least", "ADVERBIO_CANTIDAD", "menos");
+
+        add("am", "VERBO", "soy");
+        add("is", "VERBO", "es");
+        add("are", "VERBO", "son");
+        add("was", "VERBO", "fue");
+        add("were", "VERBO", "fueron");
+        add("been", "VERBO", "sido");
+        add("being", "VERBO", "siendo");
+        add("do", "VERBO", "hacer");
+        add("does", "VERBO", "hace");
+        add("did", "VERBO", "hizo");
+        add("done", "VERBO", "hecho");
+        add("have", "VERBO", "tener");
+        add("has", "VERBO", "tiene");
+        add("had", "VERBO", "tuvo");
+        add("can", "VERBO", "poder");
+        add("could", "VERBO", "podria");
+        add("may", "VERBO", "puede");
+        add("might", "VERBO", "podria");
+        add("must", "VERBO", "debe");
+        add("should", "VERBO", "deberia");
+        add("would", "VERBO", "haria");
+        add("will", "VERBO", "hara");
+
+        add("soy", "VERBO", "am");
+        add("eres", "VERBO", "are");
+        add("es", "VERBO", "is");
+        add("somos", "VERBO", "are");
+        add("son", "VERBO", "are");
+        add("fui", "VERBO", "was");
+        add("fue", "VERBO", "was");
+        add("fueron", "VERBO", "were");
+        add("hacer", "VERBO", "do");
+        add("hago", "VERBO", "do");
+        add("hace", "VERBO", "does");
+        add("hizo", "VERBO", "did");
+        add("hecho", "VERBO", "done");
+        add("tener", "VERBO", "have");
+        add("tengo", "VERBO", "have");
+        add("tiene", "VERBO", "has");
+        add("tuvo", "VERBO", "had");
+    }
+
+    private static void cargarVocabularioServiciosEmergenciasYGobierno() {
+        addBidireccionales("SUSTANTIVO", new String[][] {
+                {"emergency", "emergencia"},
+                {"police", "policia"},
+                {"firefighter", "bombero"},
+                {"ambulance", "ambulancia"},
+                {"clinic", "clinica"},
+                {"pharmacy", "farmacia"},
+                {"appointment", "cita"},
+                {"identification", "identificacion"},
+                {"license", "licencia"},
+                {"permit", "permiso"},
+                {"certificate", "certificado"},
+                {"birth certificate", "acta de nacimiento"},
+                {"address", "direccion"},
+                {"phone number", "numero de telefono"},
+                {"email address", "correo electronico"},
+                {"municipality", "municipalidad"},
+                {"government", "gobierno"},
+                {"ministry", "ministerio"},
+                {"public service", "servicio publico"},
+                {"citizen", "ciudadano"},
+                {"community service", "servicio comunitario"},
+                {"procedure", "tramite"},
+                {"form", "formulario"},
+                {"requirement", "requisito"},
+                {"deadline", "fecha limite"},
+                {"complaint", "queja"},
+                {"claim", "reclamo"},
+                {"report incident", "reporte de incidente"},
+                {"safety", "seguridad"},
+                {"risk", "riesgo"},
+                {"accident", "accidente"},
+                {"injury", "lesion"},
+                {"warning", "advertencia"},
+                {"evacuation", "evacuacion"},
+                {"shelter", "refugio"}
+        });
+
+        addBidireccionales("VERBO", new String[][] {
+                {"report", "reportar"},
+                {"request", "solicitar"},
+                {"register", "registrar"},
+                {"renew", "renovar"},
+                {"approve", "aprobar"},
+                {"reject", "rechazar"},
+                {"notify", "notificar"},
+                {"protect", "proteger"},
+                {"rescue", "rescatar"},
+                {"evacuate", "evacuar"},
+                {"prevent", "prevenir"},
+                {"assist", "asistir"}
+        });
+    }
+
+    private static void cargarVocabularioComercioLogisticaYAtencion() {
+        addBidireccionales("SUSTANTIVO", new String[][] {
+                {"customer support", "soporte al cliente"},
+                {"technical support", "soporte tecnico"},
+                {"order", "pedido"},
+                {"cart", "carrito"},
+                {"checkout", "pago final"},
+                {"shipping", "envio"},
+                {"delivery", "entrega"},
+                {"shipment", "envio"},
+                {"tracking number", "numero de seguimiento"},
+                {"warehouse", "bodega"},
+                {"inventory", "inventario"},
+                {"supplier", "proveedor"},
+                {"vendor", "vendedor"},
+                {"wholesale", "mayoreo"},
+                {"retail", "venta minorista"},
+                {"discount", "descuento"},
+                {"coupon", "cupon"},
+                {"refund", "reembolso"},
+                {"return policy", "politica de devolucion"},
+                {"warranty", "garantia"},
+                {"receipt", "recibo"},
+                {"quote", "cotizacion"},
+                {"quotation", "cotizacion"},
+                {"purchase order", "orden de compra"},
+                {"stock", "existencias"},
+                {"availability", "disponibilidad"},
+                {"branch office", "sucursal"},
+                {"cash register", "caja registradora"},
+                {"cashier", "cajero"},
+                {"payment method", "metodo de pago"},
+                {"credit card", "tarjeta de credito"},
+                {"debit card", "tarjeta de debito"},
+                {"bank transfer", "transferencia bancaria"},
+                {"installment", "cuota"},
+                {"subscription", "suscripcion"},
+                {"membership", "membresia"}
+        });
+
+        addBidireccionales("VERBO", new String[][] {
+                {"order", "pedir"},
+                {"ship", "enviar"},
+                {"deliver", "entregar"},
+                {"track", "rastrear"},
+                {"refund", "reembolsar"},
+                {"return item", "devolver producto"},
+                {"quote", "cotizar"},
+                {"charge", "cobrar"},
+                {"bill", "facturar"},
+                {"subscribe", "suscribirse"},
+                {"cancel", "cancelar"},
+                {"confirm", "confirmar"}
+        });
+
+        addBidireccionales("EXPRESION", new String[][] {
+                {"how can i help you", "en que puedo ayudarte"},
+                {"your order is ready", "tu pedido esta listo"},
+                {"payment was successful", "el pago fue exitoso"},
+                {"payment failed", "el pago fallo"},
+                {"out of stock", "agotado"},
+                {"in stock", "disponible"},
+                {"free shipping", "envio gratis"},
+                {"estimated delivery", "entrega estimada"},
+                {"customer service", "servicio al cliente"}
+        });
+    }
+
+    private static void cargarVocabularioDatosNubeDevOpsEIA() {
+        addBidireccionales("SUSTANTIVO", new String[][] {
+                {"cloud computing", "computacion en la nube"},
+                {"virtual machine", "maquina virtual"},
+                {"container", "contenedor"},
+                {"docker image", "imagen docker"},
+                {"kubernetes", "kubernetes"},
+                {"cluster", "cluster"},
+                {"load balancer", "balanceador de carga"},
+                {"scalability", "escalabilidad"},
+                {"latency", "latencia"},
+                {"throughput", "rendimiento"},
+                {"uptime", "tiempo activo"},
+                {"downtime", "tiempo fuera de servicio"},
+                {"monitoring", "monitoreo"},
+                {"logging", "registro de eventos"},
+                {"metric", "metrica"},
+                {"alert", "alerta"},
+                {"incident", "incidente"},
+                {"backup", "respaldo"},
+                {"restore", "restauracion"},
+                {"migration", "migracion"},
+                {"schema", "esquema"},
+                {"query", "consulta"},
+                {"index", "indice"},
+                {"transaction", "transaccion"},
+                {"constraint", "restriccion"},
+                {"primary key", "clave primaria"},
+                {"foreign key", "clave foranea"},
+                {"dataset", "conjunto de datos"},
+                {"data model", "modelo de datos"},
+                {"neural network", "red neuronal"},
+                {"training", "entrenamiento"},
+                {"inference", "inferencia"},
+                {"prediction", "prediccion"},
+                {"classification", "clasificacion"},
+                {"regression", "regresion"},
+                {"natural language processing", "procesamiento de lenguaje natural"},
+                {"prompt", "instruccion"},
+                {"model", "modelo"},
+                {"embedding", "representacion vectorial"},
+                {"accuracy", "precision"},
+                {"bias", "sesgo"},
+                {"privacy", "privacidad"}
+        });
+
+        addBidireccionales("VERBO", new String[][] {
+                {"scale", "escalar"},
+                {"monitor", "monitorear"},
+                {"log", "registrar"},
+                {"backup", "respaldar"},
+                {"restore", "restaurar"},
+                {"migrate", "migrar"},
+                {"index", "indexar"},
+                {"query", "consultar"},
+                {"train", "entrenar"},
+                {"predict", "predecir"},
+                {"classify", "clasificar"},
+                {"optimize", "optimizar"},
+                {"cache", "almacenar en cache"},
+                {"deploy automatically", "desplegar automaticamente"}
+        });
+
+        addBidireccionales("ADJETIVO_CALIFICATIVO", new String[][] {
+                {"scalable", "escalable"},
+                {"available", "disponible"},
+                {"reliable", "confiable"},
+                {"observable", "observable"},
+                {"encrypted", "cifrado"},
+                {"authenticated", "autenticado"},
+                {"authorized", "autorizado"},
+                {"optimized", "optimizado"},
+                {"predictive", "predictivo"},
+                {"generative", "generativo"}
+        });
+    }
+
+    private static void cargarVocabularioSaludCuerpoYEmociones() {
+        addBidireccionales("SUSTANTIVO", new String[][] {
+                {"body", "cuerpo"},
+                {"brain", "cerebro"},
+                {"lung", "pulmon"},
+                {"stomach", "estomago"},
+                {"liver", "higado"},
+                {"kidney", "rinon"},
+                {"muscle", "musculo"},
+                {"joint", "articulacion"},
+                {"allergy", "alergia"},
+                {"infection", "infeccion"},
+                {"wound", "herida"},
+                {"burn", "quemadura"},
+                {"blood pressure", "presion arterial"},
+                {"heart rate", "ritmo cardiaco"},
+                {"breathing", "respiracion"},
+                {"nutrition", "nutricion"},
+                {"exercise", "ejercicio"},
+                {"sleep", "sueño"},
+                {"rest", "descanso"},
+                {"depression", "depresion"},
+                {"fear", "miedo"},
+                {"anger", "enojo"},
+                {"joy", "alegria"},
+                {"calm", "calma"},
+                {"confidence", "confianza"},
+                {"motivation", "motivacion"},
+                {"self esteem", "autoestima"},
+                {"relationship problem", "problema de relacion"}
+        });
+
+        addBidireccionales("ADJETIVO_CALIFICATIVO", new String[][] {
+                {"healthy", "saludable"},
+                {"sick", "enfermo"},
+                {"tired", "cansado"},
+                {"worried", "preocupado"},
+                {"calm", "tranquilo"},
+                {"happy", "feliz"},
+                {"sad", "triste"},
+                {"angry", "enojado"},
+                {"afraid", "asustado"},
+                {"motivated", "motivado"},
+                {"confident", "confiado"},
+                {"comfortable", "comodo"},
+                {"uncomfortable", "incomodo"}
+        });
+
+        addBidireccionales("VERBO", new String[][] {
+                {"breathe", "respirar"},
+                {"heal", "sanar"},
+                {"recover", "recuperarse"},
+                {"rest", "descansar"},
+                {"sleep", "dormir"},
+                {"exercise", "ejercitarse"},
+                {"worry", "preocuparse"},
+                {"relax", "relajarse"},
+                {"motivate", "motivar"}
+        });
+    }
+
+    private static void cargarVocabularioEducacionInvestigacionYEscritura() {
+        addBidireccionales("SUSTANTIVO", new String[][] {
+                {"assignment", "asignacion"},
+                {"essay", "ensayo"},
+                {"thesis", "tesis"},
+                {"abstract", "resumen"},
+                {"introduction", "introduccion"},
+                {"conclusion", "conclusion"},
+                {"reference", "referencia"},
+                {"bibliography", "bibliografia"},
+                {"citation", "cita bibliografica"},
+                {"source", "fuente"},
+                {"hypothesis", "hipotesis"},
+                {"methodology", "metodologia"},
+                {"result", "resultado"},
+                {"discussion", "discusion"},
+                {"analysis", "analisis"},
+                {"argument", "argumento"},
+                {"evidence", "evidencia"},
+                {"paragraph structure", "estructura de parrafo"},
+                {"main idea", "idea principal"},
+                {"supporting idea", "idea secundaria"},
+                {"draft", "borrador"},
+                {"revision", "revision"},
+                {"rubric", "rubrica"},
+                {"presentation", "presentacion"},
+                {"slide", "diapositiva"},
+                {"workshop", "taller"},
+                {"laboratory", "laboratorio"},
+                {"experiment", "experimento"},
+                {"observation", "observacion"},
+                {"survey", "encuesta"},
+                {"sample", "muestra"},
+                {"population", "poblacion"}
+        });
+
+        addBidireccionales("VERBO", new String[][] {
+                {"summarize", "resumir"},
+                {"explain", "explicar"},
+                {"describe", "describir"},
+                {"compare", "comparar"},
+                {"contrast", "contrastar"},
+                {"evaluate", "evaluar"},
+                {"argue", "argumentar"},
+                {"cite", "citar"},
+                {"reference", "referenciar"},
+                {"revise", "revisar"},
+                {"proofread", "corregir"},
+                {"present", "presentar"},
+                {"observe", "observar"},
+                {"measure", "medir"},
+                {"calculate", "calcular"}
+        });
+
+        addBidireccionales("EXPRESION", new String[][] {
+                {"the purpose of this study", "el proposito de este estudio"},
+                {"the results show", "los resultados muestran"},
+                {"according to the author", "segun el autor"},
+                {"this essay argues that", "este ensayo argumenta que"},
+                {"further research is needed", "se necesita mas investigacion"},
+                {"in summary", "en resumen"},
+                {"to sum up", "para resumir"}
+        });
     }
 
     public static String clasificar(String palabra) {
@@ -2530,6 +3429,8 @@ public class Diccionario {
         if (tipo.equals("POSESIVO") || tipo.equals("DEMOSTRATIVO")) return "DETERMINANTE";
         if (tipo.equals("CONTRACCION")) return "CONTRACCION";
         if (tipo.equals("INTERJECCION")) return "INTERJECCION";
+        if (tipo.equals("EXPRESION") || tipo.equals("MODISMO")) return "EXPRESION";
+        if (tipo.equals("ABREVIATURA")) return "ABREVIATURA";
         return "OTRO";
     }
 
@@ -2545,11 +3446,27 @@ public class Diccionario {
                 .toList();
 
         for (String expresion : expresiones) {
-            String compacta = expresion.replace(" ", "");
-            String regex = "(?i)(?<!\\p{L})" + Pattern.quote(expresion) + "(?!\\p{L})";
-            resultado = resultado.replaceAll(regex, compacta);
+            resultado = reemplazarExpresionPreservandoMayuscula(resultado, expresion);
         }
         return resultado;
+    }
+
+    private static String reemplazarExpresionPreservandoMayuscula(String texto, String expresion) {
+        String compacta = expresion.replace(" ", "");
+        Pattern patron = Pattern.compile("(?i)(?<!\\p{L})" + Pattern.quote(expresion) + "(?!\\p{L})");
+        Matcher matcher = patron.matcher(texto);
+        StringBuffer resultado = new StringBuffer();
+
+        while (matcher.find()) {
+            String encontrada = matcher.group();
+            String reemplazo = Character.isUpperCase(encontrada.charAt(0))
+                    ? Character.toUpperCase(compacta.charAt(0)) + compacta.substring(1)
+                    : compacta;
+            matcher.appendReplacement(resultado, Matcher.quoteReplacement(reemplazo));
+        }
+
+        matcher.appendTail(resultado);
+        return resultado.toString();
     }
 
     public static String detectarIdioma(String texto) {
@@ -2730,48 +3647,60 @@ public class Diccionario {
     }
 
     public static int simbolo(String tipo) {
-        return switch (tipo) {
-            case "PRONOMBRE_PERSONAL",
-                    "PRONOMBRE_DEMOSTRATIVO",
-                    "PRONOMBRE_INTERROGATIVO" ->
-                sym.PRONOMBRE;
-            case "VERBO" -> sym.VERBO;
-            case "SUSTANTIVO" -> sym.SUSTANTIVO;
-            case "ARTICULO_DEFINIDO",
-                    "ARTICULO_INDEFINIDO" ->
-                sym.ARTICULO;
-            case "POSESIVO",
-                    "DEMOSTRATIVO",
-                    "NUMERAL_CARDINAL",
-                    "NUMERAL_ORDINAL" ->
-                sym.ARTICULO;
-            case "ADJETIVO_CALIFICATIVO" -> sym.ADJETIVO;
-            case "ADVERBIO_TIEMPO",
-                    "ADVERBIO_LUGAR",
-                    "ADVERBIO_MODO",
-                    "ADVERBIO_CANTIDAD",
-                    "ADVERBIO_AFIRMACION",
-                    "ADVERBIO_NEGACION",
-                    "ADVERBIO_DUDA" ->
-                sym.ADVERBIO;
-            case "PREPOSICION" -> sym.PREPOSICION;
-            case "CONJUNCION_COPULATIVA",
-                    "CONJUNCION_ADVERSATIVA",
-                    "CONJUNCION_DISYUNTIVA",
-                    "CONJUNCION_DISTRIBUTIVA",
-                    "CONJUNCION_EXPLICATIVA",
-                    "CONJUNCION_CAUSAL",
-                    "CONJUNCION_CONDICIONAL",
-                    "CONJUNCION_CONCESIVA",
-                    "CONJUNCION_COMPARATIVA",
-                    "CONJUNCION_FINAL",
-                    "CONJUNCION_CONSECUTIVA",
-                    "CONJUNCION_SUSTANTIVA" ->
-                sym.CONJUNCION;
-            case "CONTRACCION" -> sym.CONTRACCION;
+        if (tipo == null) {
+            return sym.SUSTANTIVO;
+        }
 
-            default -> sym.SUSTANTIVO;
-        };
+        switch (tipo) {
+            case "PRONOMBRE_PERSONAL":
+            case "PRONOMBRE_DEMOSTRATIVO":
+            case "PRONOMBRE_INTERROGATIVO":
+                return sym.PRONOMBRE;
+            case "VERBO":
+            case "PHRASAL_VERB":
+                return sym.VERBO;
+            case "SUSTANTIVO":
+            case "EXPRESION":
+            case "MODISMO":
+            case "ABREVIATURA":
+                return sym.SUSTANTIVO;
+            case "ARTICULO_DEFINIDO":
+            case "ARTICULO_INDEFINIDO":
+            case "POSESIVO":
+            case "DEMOSTRATIVO":
+            case "NUMERAL_CARDINAL":
+            case "NUMERAL_ORDINAL":
+                return sym.ARTICULO;
+            case "ADJETIVO_CALIFICATIVO":
+                return sym.ADJETIVO;
+            case "ADVERBIO_TIEMPO":
+            case "ADVERBIO_LUGAR":
+            case "ADVERBIO_MODO":
+            case "ADVERBIO_CANTIDAD":
+            case "ADVERBIO_AFIRMACION":
+            case "ADVERBIO_NEGACION":
+            case "ADVERBIO_DUDA":
+                return sym.ADVERBIO;
+            case "PREPOSICION":
+                return sym.PREPOSICION;
+            case "CONJUNCION_COPULATIVA":
+            case "CONJUNCION_ADVERSATIVA":
+            case "CONJUNCION_DISYUNTIVA":
+            case "CONJUNCION_DISTRIBUTIVA":
+            case "CONJUNCION_EXPLICATIVA":
+            case "CONJUNCION_CAUSAL":
+            case "CONJUNCION_CONDICIONAL":
+            case "CONJUNCION_CONCESIVA":
+            case "CONJUNCION_COMPARATIVA":
+            case "CONJUNCION_FINAL":
+            case "CONJUNCION_CONSECUTIVA":
+            case "CONJUNCION_SUSTANTIVA":
+                return sym.CONJUNCION;
+            case "CONTRACCION":
+                return sym.CONTRACCION;
+            default:
+                return sym.SUSTANTIVO;
+        }
     }
 }
 

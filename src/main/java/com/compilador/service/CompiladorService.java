@@ -158,7 +158,8 @@ public class CompiladorService {
             try {
                 java_cup.runtime.Symbol sym;
                 while ((sym = lexer.next_token()).sym != com.compilador.parser.sym.EOF) {
-                    if (sym.value instanceof Token t) {
+                    if (sym.value instanceof Token) {
+                        Token t = (Token) sym.value;
                         tokOracion.add(t);
                     }
                 }
@@ -205,7 +206,7 @@ public class CompiladorService {
             // incorrectas si el String llegó mal al servicio.
             // ════════════════════════════════════════
             Lexer lexer2 = new Lexer(toUtf8Reader(oracion));
-            Parser parser = new Parser(lexer2);
+            Parser parser = new Parser(lexer2, new java_cup.runtime.ComplexSymbolFactory());
             try {
                 parser.parse();
             } catch (Exception e) {
@@ -391,12 +392,6 @@ public class CompiladorService {
         }
 
         return ingles >= espanol ? "en" : "es";
-    }
-
-    private boolean esTokenIngles(String valor) {
-        return Set.of("the","a","an","is","are","was","were","i","he","she",
-                        "we","they","you","it","have","has","do","does")
-                .contains(valor.toLowerCase());
     }
 
     // ════════════════════════════════════════

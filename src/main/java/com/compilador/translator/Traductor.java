@@ -972,15 +972,25 @@ public class Traductor {
         if (sustTrad != null)
             g = generoSustantivo.getOrDefault(sustTrad, "M");
 
-        return switch (articulo) {
-            case "the" -> g.equals("F") ? "la" : "el";
-            case "a", "an" -> g.equals("F") ? "una" : "un";
-            case "some" -> g.equals("F") ? "unas" : "unos";
-            case "el", "un" -> "the";
-            case "la", "una" -> "the";
-            case "los", "unos" -> "the";
-            case "las", "unas" -> "the";
-            default -> articulo;
-        };
+        switch (articulo) {
+            case "the":
+                return g.equals("F") ? "la" : "el";
+            case "a":
+            case "an":
+                return g.equals("F") ? "una" : "un";
+            case "some":
+                return g.equals("F") ? "unas" : "unos";
+            case "el":
+            case "un":
+            case "la":
+            case "una":
+            case "los":
+            case "unos":
+            case "las":
+            case "unas":
+                return "the";
+            default:
+                return articulo;
+        }
     }
 }

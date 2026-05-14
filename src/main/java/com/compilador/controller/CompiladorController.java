@@ -8,14 +8,17 @@ import com.compilador.model.ResultadoAnalisis;
 import com.compilador.service.CompiladorService;
 import com.compilador.translator.CloudTranslatorAPI;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
-import java.util.Map;
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api")
-@CrossOrigin(origins = "*")
 public class CompiladorController {
 
     @Autowired
@@ -26,12 +29,8 @@ public class CompiladorController {
 
     @PostMapping(value = "/analizar", consumes = "application/json;charset=UTF-8")
     public ResultadoAnalisis analizar(@RequestBody AnalizarRequest body) {
-
         String texto = body.getTexto();
         boolean usarIA = body.isUsarIA();
-
-        // 🔍 DEBUG (puedes quitar luego)
-        System.out.println("TEXTO RECIBIDO: " + texto);
 
         return compiladorService.analizar(texto, usarIA);
     }
@@ -51,5 +50,10 @@ public class CompiladorController {
         return Map.of(
                 "provider", cloudTranslatorAPI.getProvider(),
                 "configured", cloudTranslatorAPI.estaConfigurado());
+    }
+
+    @GetMapping("/health")
+    public Map<String, Object> health() {
+        return Map.of("status", "ok");
     }
 }

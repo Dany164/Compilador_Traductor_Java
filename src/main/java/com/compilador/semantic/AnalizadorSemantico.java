@@ -29,10 +29,12 @@ public class AnalizadorSemantico {
             "CONJUNCION_CONCESIVA", "CONJUNCION_COMPARATIVA",
             "CONJUNCION_FINAL", "CONJUNCION_CONSECUTIVA",
             "CONJUNCION_SUSTANTIVA");
+    private static final Set<String> TIPOS_EXPRESION = Set.of(
+            "EXPRESION", "MODISMO", "ABREVIATURA");
     private static final Set<String> PUEDE_SER_SUJETO = Set.of(
             "PRONOMBRE", "PRONOMBRE_PERSONAL",
             "PRONOMBRE_DEMOSTRATIVO", "PRONOMBRE_INTERROGATIVO",
-            "SUSTANTIVO", "CONTRACCION");
+            "SUSTANTIVO", "CONTRACCION", "EXPRESION", "MODISMO", "ABREVIATURA");
     private static final Set<String> PUEDE_INICIAR_ORACION = Set.of(
             "PRONOMBRE", "PRONOMBRE_PERSONAL", "PRONOMBRE_DEMOSTRATIVO",
             "PRONOMBRE_INTERROGATIVO", "SUSTANTIVO", "CONTRACCION",
@@ -40,10 +42,10 @@ public class AnalizadorSemantico {
             "POSESIVO", "DEMOSTRATIVO", "NUMERAL_CARDINAL", "NUMERAL_ORDINAL",
             "ADVERBIO", "ADVERBIO_TIEMPO", "ADVERBIO_LUGAR", "ADVERBIO_MODO",
             "ADVERBIO_CANTIDAD", "ADVERBIO_AFIRMACION", "ADVERBIO_NEGACION", "ADVERBIO_DUDA",
-            "INTERJECCION");
+            "INTERJECCION", "EXPRESION", "MODISMO", "ABREVIATURA");
     private static final Set<String> PUEDE_SER_OBJETO = Set.of(
             "SUSTANTIVO", "PRONOMBRE", "PRONOMBRE_PERSONAL",
-            "PRONOMBRE_DEMOSTRATIVO");
+            "PRONOMBRE_DEMOSTRATIVO", "EXPRESION", "MODISMO", "ABREVIATURA");
     private static final Set<String> TIPOS_PUNTUACION = Set.of(
             "PUNTO", "COMA", "INTERROGACION", "EXCLAMACION");
 
@@ -95,8 +97,8 @@ public class AnalizadorSemantico {
 
     // REGLA 2 — Debe existir al menos un verbo
     private void regla2_ExisteVerbo(List<Token> palabras) {
-        // Si solo hay 1-2 palabras, permitir sin verbo (palabras sueltas)
-        if (palabras.size() <= 2) return;
+        // Expresiones cortas como palabras sueltas o frases nominales no requieren verbo.
+        if (esExpresionCortaSinVerboValida(palabras)) return;
 
         boolean tieneVerbo = palabras.stream()
                 .anyMatch(t -> t.getTipo().equals("VERBO"));
@@ -116,6 +118,7 @@ public class AnalizadorSemantico {
                     || TIPOS_ADJETIVO.contains(t.getTipo())
                     || TIPOS_ADVERBIO.contains(t.getTipo())
                     || TIPOS_CONJUNCION.contains(t.getTipo())
+                    || TIPOS_EXPRESION.contains(t.getTipo())
                     || t.getTipo().equals("SUSTANTIVO")
                     || t.getTipo().equals("INTERJECCION")
                     || t.getTipo().equals("NUMERAL_CARDINAL")

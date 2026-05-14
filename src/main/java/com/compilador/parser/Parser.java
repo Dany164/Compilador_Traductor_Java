@@ -9,7 +9,6 @@ import com.compilador.ast.NodoAST;
 import java.util.List;
 import java.util.ArrayList;
 import java_cup.runtime.*;
-import java_cup.runtime.XMLElement;
 
 /** CUP v0.11b 20160615 (GIT 4ac7450) generated parser.
   */
@@ -179,7 +178,7 @@ public class Parser extends java_cup.runtime.lr_parser {
 
 
 /** Cup generated class to encapsulate user supplied action code.*/
-@SuppressWarnings({"rawtypes", "unchecked", "unused"})
+@SuppressWarnings("unused")
 class CUP$Parser$actions {
   private final Parser parser;
 

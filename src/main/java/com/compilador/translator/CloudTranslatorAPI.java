@@ -11,6 +11,7 @@ import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.nio.charset.StandardCharsets;
+import java.time.Duration;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -34,7 +35,12 @@ public class CloudTranslatorAPI {
     @Value("${translator.api.provider:google}")
     private String provider;
 
-    private final HttpClient httpClient = HttpClient.newHttpClient();
+    @Value("${translator.api.timeout-seconds:8}")
+    private long timeoutSeconds;
+
+    private final HttpClient httpClient = HttpClient.newBuilder()
+            .connectTimeout(Duration.ofSeconds(5))
+            .build();
     private final ObjectMapper mapper = new ObjectMapper();
 
     public boolean estaConfigurado() {
@@ -126,6 +132,7 @@ public class CloudTranslatorAPI {
 
             HttpRequest request = HttpRequest.newBuilder()
                     .uri(URI.create(url))
+                    .timeout(Duration.ofSeconds(timeoutSeconds))
                     .header("Content-Type", "application/json")
                     .POST(HttpRequest.BodyPublishers.ofString(
                             mapper.writeValueAsString(payload),
@@ -168,6 +175,7 @@ public class CloudTranslatorAPI {
 
         HttpRequest request = HttpRequest.newBuilder()
                 .uri(URI.create(url))
+                .timeout(Duration.ofSeconds(timeoutSeconds))
                 .header("Content-Type", "application/json")
                 .POST(HttpRequest.BodyPublishers.ofString(
                         mapper.writeValueAsString(payload),
@@ -201,6 +209,7 @@ public class CloudTranslatorAPI {
 
         HttpRequest request = HttpRequest.newBuilder()
                 .uri(URI.create(url))
+                .timeout(Duration.ofSeconds(timeoutSeconds))
                 .header("Ocp-Apim-Subscription-Key", apiKey)
                 .header("Ocp-Apim-Subscription-Region", region)
                 .header("Content-Type", "application/json")

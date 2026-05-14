@@ -17,10 +17,14 @@ function TablaSimbolosComponent({ tablaSimbolos }) {
     OTRO:         "#555",
   };
 
+  const colorTextoCategoria = (categoria) => (
+    categoria === "INTERJECCION" ? "#202124" : "#ffffff"
+  );
+
   return (
     <div className="table-container">
       <h3>📖 Tabla de Símbolos</h3>
-      <table>
+      <table className="data-table symbols-table">
         <thead>
           <tr>
             <th>#</th>
@@ -36,23 +40,22 @@ function TablaSimbolosComponent({ tablaSimbolos }) {
           {tablaSimbolos.map((s, i) => (
             <tr key={`${s.palabra}-${s.linea}-${s.columna}-${i}`}>
               <td>{s.numero}</td>
-              <td><strong>{s.palabra}</strong></td>
+              <td className="word-cell"><strong>{s.palabra}</strong></td>
               <td>
-                <span style={{
-                  background:   coloresCategoria[s.categoria] || "#555",
-                  color:        "white",
-                  padding:      "2px 8px",
-                  borderRadius: "4px",
-                  fontSize:     "0.78rem",
-                  fontWeight:   "bold"
-                }}>
+                <span
+                  className="symbol-badge"
+                  style={{
+                    backgroundColor: coloresCategoria[s.categoria] || "#555",
+                    color: colorTextoCategoria(s.categoria),
+                  }}
+                >
                   {s.categoria}
                 </span>
               </td>
-              <td style={{ fontSize: "0.82rem", color: "#aaa" }}>
+              <td className="symbol-subcategory">
                 {s.subcategoria}
               </td>
-              <td>{s.traduccion}</td>
+              <td className="word-cell">{s.traduccion}</td>
               <td>{s.linea}</td>
               <td>{s.columna}</td>
             </tr>
