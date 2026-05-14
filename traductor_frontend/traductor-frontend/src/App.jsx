@@ -1,8 +1,16 @@
+import { useState } from "react";
 import Translator from "./components/Translator";
+import Login from "./components/Login";
 import logoTitulo from "../img/LogoCompiTrad.png";
 import "./App.css";
 
 function App() {
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+
+  if (!isAuthenticated) {
+    return <Login onLogin={() => setIsAuthenticated(true)} />;
+  }
+
   return (
     <div className="app">
       <header className="app-header">
