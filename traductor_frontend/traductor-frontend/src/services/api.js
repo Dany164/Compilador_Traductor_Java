@@ -1,7 +1,10 @@
 import axios from "axios";
 
 const configuredBaseUrl = import.meta.env.VITE_API_BASE_URL;
-const BASE_URL = configuredBaseUrl || (import.meta.env.PROD ? "/api" : "http://localhost:8081/api");
+const isLocalApiUrl = /^https?:\/\/(localhost|127\.0\.0\.1|\[::1\])(?::|\/|$)/i.test(configuredBaseUrl || "");
+const BASE_URL = configuredBaseUrl && !(import.meta.env.PROD && isLocalApiUrl)
+  ? configuredBaseUrl
+  : (import.meta.env.PROD ? "/api" : "http://localhost:8081/api");
 const API_TIMEOUT_MS = Number(import.meta.env.VITE_API_TIMEOUT_MS) || 15000;
 
 const api = axios.create({
