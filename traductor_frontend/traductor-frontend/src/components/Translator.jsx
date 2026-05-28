@@ -442,7 +442,7 @@ function Translator() {
   const hayResultados = tokens.length > 0 || errores.length > 0 || tablaSimbolos.length > 0 || astJson;
 
   return (
-    <div className="translator-wrapper">
+    <div className={`translator-wrapper ${mostrarResultados ? "has-results" : ""}`}>
       <div className="panels">
         <div className="panel panel-input">
           <div className="panel-header">

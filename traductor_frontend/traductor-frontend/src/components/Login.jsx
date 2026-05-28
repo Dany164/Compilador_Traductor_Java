@@ -1,26 +1,26 @@
 import { useState } from "react";
 import logoCompiTrad from "../../img/LogoCompiTrad.png";
-
-const TEST_USERS = [
-  { email: "admin@traductor.com", password: "123456" },
-  { email: "nayeli@traductor.com", password: "nayeli1234" },
-  { email: "manuel@traductor.com", password: "manuel1234" },
-  { email: "dany@traductor.com", password: "dany1234" },
-];
+import { authenticateUser, getPlanById } from "../auth/plans";
+import CircuitDecor from "./CircuitDecor";
 
 function isValidEmail(email) {
   return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
 }
 
-function Login({ onLogin }) {
+function Login({ selectedPlan, onLogin }) {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [errors, setErrors] = useState({});
+  const plan = getPlanById(selectedPlan);
 
   const validateForm = () => {
     const nextErrors = {};
     const cleanEmail = email.trim();
+
+    if (!plan) {
+      nextErrors.form = "No se ha seleccionado ningun plan. Regresa y elige un plan para continuar.";
+    }
 
     if (!cleanEmail) {
       nextErrors.email = "Ingresa tu correo electronico.";
@@ -43,48 +43,31 @@ function Login({ onLogin }) {
       return;
     }
 
-    const userExists = TEST_USERS.some(
-      (user) => user.email === email.trim().toLowerCase() && user.password === password,
-    );
+    const authResult = authenticateUser({
+      email,
+      password,
+      selectedPlan,
+    });
 
-    if (userExists) {
+    if (authResult.ok) {
       setErrors({});
-      onLogin();
+      onLogin(authResult.user);
       return;
     }
 
     setErrors({
-      form: "Credenciales incorrectas. Revisa el correo y la contrasena.",
+      form: authResult.message,
     });
   };
 
   return (
     <main className="login-screen">
-      <div className="circuit circuit-left" aria-hidden="true">
-        <span className="circuit-line line-a" />
-        <span className="circuit-line line-b" />
-        <span className="circuit-line line-c" />
-        <span className="circuit-line line-d" />
-        <span className="circuit-dot dot-a" />
-        <span className="circuit-dot dot-b" />
-        <span className="circuit-dot dot-c" />
-      </div>
-
-      <div className="circuit circuit-right" aria-hidden="true">
-        <span className="circuit-line line-a" />
-        <span className="circuit-line line-b" />
-        <span className="circuit-line line-c" />
-        <span className="circuit-line line-d" />
-        <span className="circuit-dot dot-a" />
-        <span className="circuit-dot dot-b" />
-        <span className="circuit-dot dot-c" />
-      </div>
+      <CircuitDecor />
 
       <section className="login-layout" aria-labelledby="login-title">
-        <div className="login-hero">
-          <p className="welcome-text">BIENVENIDOS A</p>
+        <div className="login-hero login-hero-compact">
           <img className="login-logo" src={logoCompiTrad} alt="CompiTrad DMN" />
-          <p className="login-subtitle">Traductor académico inglés - español</p>
+          {plan && <p className="login-plan-title">{plan.loginName}</p>}
         </div>
 
         <form className="login-card" onSubmit={handleSubmit} noValidate>
@@ -92,7 +75,7 @@ function Login({ onLogin }) {
             <LockIcon />
           </div>
 
-          <h1 id="login-title">INICIAR SESIÓN</h1>
+          <h1 id="login-title">INICIAR SESION</h1>
           <p className="login-helper">Ingresa tus credenciales para continuar</p>
 
           {errors.form && (
@@ -150,7 +133,7 @@ function Login({ onLogin }) {
           )}
 
           <button className="login-submit" type="submit">
-            INICIAR SESIÓN
+            INICIAR SESION
           </button>
         </form>
       </section>
