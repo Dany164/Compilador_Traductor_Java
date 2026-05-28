@@ -91,10 +91,22 @@ El boton de voz funciona en navegadores con Web Speech API, principalmente Chrom
 
 ## Despliegue
 
-Para el frontend puedes usar Vercel en el plan gratis apuntando al backend publicado:
+El frontend ahora incluye funciones serverless compatibles con Vercel en:
+
+```text
+traductor_frontend/traductor-frontend/api
+```
+
+En Vercel deja sin configurar `VITE_API_BASE_URL` para que el build use `/api` del mismo dominio y no intente llamar a `localhost:8081`. Si quieres usar un backend Spring Boot externo, entonces si configura:
 
 ```text
 VITE_API_BASE_URL=https://tu-backend/api
 ```
 
-Para el backend Spring Boot, Vercel no es la opcion mas comoda porque esta pensado principalmente para frontends y funciones serverless. Recomiendo Render, Railway o Fly.io para desplegar el `.jar` o un contenedor Docker. En modo academico puedes conservar la llave directa en `application.properties`; en un despliegue publico real conviene moverla a secretos de la plataforma.
+Para desarrollo local, el frontend sigue usando `http://localhost:8081/api` cuando no esta en modo produccion.
+
+El backend Spring Boot se conserva para desarrollo local o para desplegarlo como servicio dedicado en Render, Railway o Fly.io. Si cambias `src/main/java/com/compilador/lexer/Diccionario.java`, regenera la copia serverless con:
+
+```powershell
+node tools\generate-vercel-dictionary.cjs
+```

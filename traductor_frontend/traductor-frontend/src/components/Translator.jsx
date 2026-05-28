@@ -277,7 +277,7 @@ function Translator() {
         if (activo) {
           dispatch({
             type: "AUTO_ERROR",
-            payload: "Backend no disponible. Inicia Spring Boot en localhost:8081.",
+            payload: "Servicio de traduccion no disponible. Intenta de nuevo en un momento.",
           });
         }
       }
@@ -302,7 +302,7 @@ function Translator() {
           tipo: "LEXICO",
           linea: 0,
           columna: 0,
-          descripcion: "No se pudo conectar al backend. Ejecuta Spring Boot en localhost:8081.",
+          descripcion: "No se pudo conectar al servicio de analisis.",
         },
       });
     }
